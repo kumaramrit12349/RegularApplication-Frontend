@@ -1,35 +1,190 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// App.tsx
+import 'bootstrap/dist/css/bootstrap.min.css';  // ✅ add this at the top
+import './styles.css'; 
+import React from "react";
+import ListView from "./assets/Component/ListView";
+const temp = {
+  job: [
+    {
+      name: "Notification 1",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 3",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 4",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 5",
+      notification_id: "Notification#1",
+    }
+  ],
+  admitCard: [
+    {
+      name: "Notification 1",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 3",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 4",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 5",
+      notification_id: "Notification#1",
+    },
+     {
+      name: "Notification 1",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 3",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 4",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 5",
+      notification_id: "Notification#1",
+    }
+  ],
+  result: [
+    {
+      name: "Notification 1",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 3",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 4",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 5",
+      notification_id: "Notification#1",
+    }
+  ],
+  entrance: [
+    {
+      name: "Notification 1",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 3",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 4",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 5",
+      notification_id: "Notification#1",
+    }
+  ],
+  answer: [
+    {
+      name: "Notification 1",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 2",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 3",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 4",
+      notification_id: "Notification#1",
+    },
+    {
+      name: "Notification 5",
+      notification_id: "Notification#1",
+    }
+  ]
 }
 
-export default App
+
+const App: React.FC = () => {
+  const handleItemClick = (item: { name: string; notification_id: string }) => {
+    // alert(`Clicked on ${item.name}`);
+    alert(`Clicked on ${item.name} and ${item.notification_id}`);
+    
+  };
+
+  return (
+    <div className="container py-4">
+      <div className="row g-4">
+        {Object.entries(temp).map(([category, notifications]) => (
+          <div key={category} className="col-12 col-md-6 col-lg-4">
+            <div className="card h-100 shadow-sm">
+              <ListView
+                title={category}
+                items={notifications}
+                onItemClick={handleItemClick}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default App;

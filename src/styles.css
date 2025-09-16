@@ -1,0 +1,21 @@
+/* styles.css */
+.circle-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #007bff; /* Bootstrap primary blue */
+  border-radius: 50%;
+  background-color: transparent; /* initially blank */
+  transition: background-color 0.3s ease;
+}
+
+/* When hovering over the whole list item, fill the circle */
+.list-item-clickable:hover .circle-indicator {
+  background-color: #007bff; /* fill with blue */
+}
+
+/* optional hover for the whole item background */
+.list-item-clickable:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
