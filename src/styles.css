@@ -1,21 +1,59 @@
-/* styles.css */
+/* ========================= */
+/*  CIRCLE INDICATOR + LIST ITEM STYLES */
+/* ========================= */
+
 .circle-indicator {
   display: inline-block;
   width: 10px;
   height: 10px;
-  border: 2px solid #007bff; /* Bootstrap primary blue */
+  
+  border: 2px solid #007bff; /* blue border */
   border-radius: 50%;
   background-color: transparent; /* initially blank */
   transition: background-color 0.3s ease;
+  margin-right: 6px;
 }
 
-/* When hovering over the whole list item, fill the circle */
-.list-item-clickable:hover .circle-indicator {
-  background-color: #007bff; /* fill with blue */
+.list-item-clickable {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
 }
 
-/* optional hover for the whole item background */
 .list-item-clickable:hover {
   background-color: #f1f1f1;
   cursor: pointer;
+}
+
+.list-item-clickable:hover .circle-indicator {
+  background-color: #007bff; /* fill blue on hover */
+}
+
+/* ========================= */
+/*  SEE MORE / SEE LESS BUTTON STYLING */
+/* ========================= */
+
+.see-more-btn {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: white;
+  background-color:#007bff;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  padding: 5x 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.see-more-btn:hover {
+  color: #fff;
+  background-color: #007bff;
+}
+
+/* optional center alignment for the see-more button container */
+.text-center .see-more-btn {
+  display: inline-block;
 }

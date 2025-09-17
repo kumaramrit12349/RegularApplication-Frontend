@@ -1,5 +1,5 @@
 // ListView.tsx
-import React from "react";
+import React, { useState } from "react";
 
 interface Notification {
   name: string;
@@ -13,6 +13,11 @@ interface ListViewProps {
 }
 
 const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
+  const [showAll, setShowAll] = useState(false);
+
+  // show only first 5 if not expanded
+  const displayedItems = showAll ? items : items.slice(0, 5);
+
   return (
     <>
       {/* Card Header */}
@@ -23,7 +28,7 @@ const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
       {/* Card Body */}
       <div className="card-body p-0">
         <ul className="list-group list-group-flush">
-          {items.map((item, index) => (
+          {displayedItems.map((item, index) => (
             <li
               key={index}
               className="list-group-item d-flex align-items-center gap-2 list-item-clickable"
@@ -35,6 +40,20 @@ const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
             </li>
           ))}
         </ul>
+
+        {/* Show see more/less button only if more than 5 items */}
+        {items.length > 5 && (
+          <div className="text-center p-2">
+            <button
+              className="see-more-btn"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll
+                ? "See less notifications..."
+                : "See more notifications..."}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
