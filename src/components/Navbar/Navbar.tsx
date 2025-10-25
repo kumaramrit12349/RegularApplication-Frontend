@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
       <div className="navbar-left">
         {/* Logo image/icon */}
         <img
-          src="./logo.webp" // place logo.png inside public folder
+          src="./logo.png" // place logo.png inside public folder
           alt="Logo"
           className="navbar-logo"
         />

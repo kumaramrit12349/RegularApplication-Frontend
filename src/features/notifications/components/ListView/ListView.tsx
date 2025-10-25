@@ -43,14 +43,14 @@ const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
 
         {/* Show see more/less button only if more than 5 items */}
         {items.length > 5 && (
-          <div className="text-center p-2">
+          <div className="p-2 text-center">
             <button
-              className="see-more-btn"
+              className="btn btn-primary w-100"
               onClick={() => setShowAll(!showAll)}
             >
               {showAll
-                ? "See less notifications..."
-                : "See more notifications..."}
+                ? "See Less"
+                : "See More"}
             </button>
           </div>
         )}

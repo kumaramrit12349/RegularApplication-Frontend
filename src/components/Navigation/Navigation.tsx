@@ -14,7 +14,7 @@ const Navigation: React.FC = () => {
       {/* Sub Navbar */}
       <nav className="sub-navbar">
         <div className="container">
-          <ul className="sub-nav-list">
+          <ul className="sub-nav-list mt-4">
             <li className="sub-nav-item">Home</li>
             <li className="sub-nav-item">Jobs</li>
             <li className="sub-nav-item">Admit Cards</li>
