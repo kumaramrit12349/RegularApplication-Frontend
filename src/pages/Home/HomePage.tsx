@@ -42,9 +42,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className='page'>
-      <Navbar />
-      <Navigation />
-      <SearchBar />
       <div className="container py-4">
         <div className="row g-4">
           {Object.entries(temp).map(([category, notifications]) => (
@@ -60,7 +57,6 @@ const HomePage: React.FC = () => {
           ))}
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// ListView.tsx
 import React, { useState } from "react";
 
 interface Notification {
@@ -15,47 +14,127 @@ interface ListViewProps {
 const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
   const [showAll, setShowAll] = useState(false);
 
-  // show only first 5 if not expanded
+  // Show only first 5 if not expanded
   const displayedItems = showAll ? items : items.slice(0, 5);
 
   return (
-    <>
+    <div className="border-0 mb-4">
       {/* Card Header */}
-      <h5 className="card-header bg-primary text-white text-capitalize">
-        {title}
-      </h5>
+      <div className="card-header bg-primary text-white py-3">
+        <h5 className="mb-0 fw-semibold text-capitalize">{title}</h5>
+      </div>
 
       {/* Card Body */}
       <div className="card-body p-0">
-        <ul className="list-group list-group-flush">
-          {displayedItems.map((item, index) => (
-            <li
-              key={index}
-              className="list-group-item d-flex align-items-center gap-2 list-item-clickable"
-              onClick={() => onItemClick && onItemClick(item)}
-            >
-              {/* Blank Circle */}
-              <span className="circle-indicator"></span>
-              <strong>{item.name}</strong>
-            </li>
-          ))}
-        </ul>
-
-        {/* Show see more/less button only if more than 5 items */}
-        {items.length > 5 && (
-          <div className="p-2 text-center">
-            <button
-              className="btn btn-primary w-100"
-              onClick={() => setShowAll(!showAll)}
-            >
-              {showAll
-                ? "See Less"
-                : "See More"}
-            </button>
+        {items.length === 0 ? (
+          <div className="text-center py-5 text-muted">
+            <p className="mb-0">No notifications available</p>
           </div>
+        ) : (
+          <>
+            <ul className="list-group list-group-flush">
+              {displayedItems.map((item, index) => (
+                <li
+                  key={item.notification_id || index}
+                  className="list-group-item list-group-item-action d-flex align-items-center gap-3 py-3"
+                  onClick={() => onItemClick && onItemClick(item)}
+                  style={{
+                    cursor: onItemClick ? "pointer" : "default",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (onItemClick) {
+                      e.currentTarget.style.backgroundColor = "#f8f9fa";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "";
+                  }}
+                >
+                  {/* Circle Indicator */}
+                  <span
+                    className="rounded-circle bg-primary"
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      flexShrink: 0,
+                    }}
+                  ></span>
+
+                  {/* Notification Text */}
+                  <div className="flex-grow-1">
+                    <span className="text-dark">{item.name}</span>
+                  </div>
+
+                  {/* Arrow Icon (if clickable) */}
+                  {onItemClick && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="text-muted"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+                      />
+                    </svg>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* See More/Less Button */}
+            {items.length > 5 && (
+              <div className="p-3 bg-light border-top">
+                <button
+                  className="btn btn-outline-primary w-100"
+                  onClick={() => setShowAll(!showAll)}
+                >
+                  {showAll ? (
+                    <>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        className="me-2"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"
+                        />
+                      </svg>
+                      See Less
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        className="me-2"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"
+                        />
+                      </svg>
+                      See More ({items.length - 5} more)
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
