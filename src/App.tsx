@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// App.tsx
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles.css';
+import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import HomePage from './pages/Home/HomePage';
+import DashboardPage from './pages/admin/DashboardPage';
+import AddNotificationPage from "./pages/admin/AddNotificationPage";
+import EditNotificationPage from './pages/admin/EditNotificationPage';
+import ReviewNotificationPage from './pages/admin/ReviewNotificationPage';
+import Navbar from './components/Navbar/Navbar';
+import Navigation from './components/Navigation/Navigation';
+import SearchBar from './components/SearchBar/SearchBar';
+import Footer from './components/Footer/Footer';
 
-function App() {
-  const [count, setCount] = useState(0)
+const AppLayout: React.FC = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="d-flex flex-column min-vh-100">
+      {/* Navbar - Always visible */}
+      <Navbar />
+      
+      {/* Navigation - Only on public pages */}
+      {!isAdminRoute && <Navigation />}
+      
+      {/* SearchBar - Only on public pages */}
+      {!isAdminRoute && <SearchBar />}
+      
+      {/* Main Content */}
+      <main className="flex-grow-1">
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<DashboardPage />} />
+          <Route path="/admin/addNotification" element={<AddNotificationPage />} />
+          <Route path="/admin/edit/:id" element={<EditNotificationPage />} />
+          <Route path="/admin/review/:id" element={<ReviewNotificationPage />} />
+        </Routes>
+      </main>
+      
+      {/* Footer - Always visible */}
+      <Footer />
+    </div>
+  );
+};
 
-export default App
+const App: React.FC = () => {
+  return (
+    <Router>
+      <AppLayout />
+    </Router>
+  );
+};
+
+export default App;
