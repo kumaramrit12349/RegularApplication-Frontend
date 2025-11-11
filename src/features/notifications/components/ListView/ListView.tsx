@@ -8,13 +8,12 @@ interface Notification {
 interface ListViewProps {
   title: string;
   items: Notification[];
+  loading?: boolean;
   onItemClick?: (item: Notification) => void;
 }
 
-const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
+const ListView: React.FC<ListViewProps> = ({ title, items, loading = false, onItemClick }) => {
   const [showAll, setShowAll] = useState(false);
-
-  // Show only first 5 if not expanded
   const displayedItems = showAll ? items : items.slice(0, 5);
 
   return (
@@ -26,7 +25,13 @@ const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
 
       {/* Card Body */}
       <div className="card-body p-0">
-        {items.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : items.length === 0 ? (
           <div className="text-center py-5 text-muted">
             <p className="mb-0">No notifications available</p>
           </div>
@@ -51,7 +56,6 @@ const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
                     e.currentTarget.style.backgroundColor = "";
                   }}
                 >
-                  {/* Circle Indicator */}
                   <span
                     className="rounded-circle bg-primary"
                     style={{
@@ -60,13 +64,9 @@ const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
                       flexShrink: 0,
                     }}
                   ></span>
-
-                  {/* Notification Text */}
                   <div className="flex-grow-1">
                     <span className="text-dark">{item.name}</span>
                   </div>
-
-                  {/* Arrow Icon (if clickable) */}
                   {onItemClick && (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -85,8 +85,6 @@ const ListView: React.FC<ListViewProps> = ({ title, items, onItemClick }) => {
                 </li>
               ))}
             </ul>
-
-            {/* See More/Less Button */}
             {items.length > 5 && (
               <div className="p-3 bg-light border-top">
                 <button

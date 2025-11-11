@@ -63,6 +63,13 @@ export const addNotification = async (data: NotificationFormData) => {
 };
 
 // Fetch all notifications
+export const fetchHomePageNotifications = async () => {
+  const response = await fetch(`${API_BASE_URL}/notification/home`);
+  if (!response.ok) throw new Error("Failed to fetch notifications");
+  return response.json();
+};
+
+// Fetch all notifications
 export const fetchNotifications = async () => {
   const response = await fetch(`${API_BASE_URL}/notification/view`);
   if (!response.ok) throw new Error("Failed to fetch notifications");
@@ -71,7 +78,7 @@ export const fetchNotifications = async () => {
 
 // Get single notification by ID
 export const getNotificationById = async (id: string) => {
-  const response = await fetch(`${API_BASE_URL}/notification/${id}`);
+  const response = await fetch(`${API_BASE_URL}/notification/getById/${id}`);
   if (!response.ok) throw new Error("Failed to fetch notification");
   return response.json();
 };

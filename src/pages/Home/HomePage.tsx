@@ -1,60 +1,64 @@
-// src/pages/HomePage.tsx
-import React from "react";
-import Navbar from "../../components/Navbar/Navbar";
-import Navigation from "../../components/Navigation/Navigation";
-import SearchBar from "../../components/SearchBar/SearchBar";
+import React, { useEffect, useState } from "react";
 import ListView from "../../features/notifications/components/ListView/ListView";
-import Footer from "../../components/Footer/Footer";
+import { fetchHomePageNotifications } from "../../services/api";
 
-const temp = {
-  job: [
-    { name: "Notification 1", notification_id: "Notification#1" },
-    { name: "Notification 2", notification_id: "Notification#2" },
-    { name: "Notification 3", notification_id: "Notification#3" },
-    { name: "Notification 4", notification_id: "Notification#4" },
-    { name: "Notification 5", notification_id: "Notification#5" },
-  ],
-  admitCard: [
-    { name: "Notification 1", notification_id: "Notification#1" },
-    { name: "Notification 2", notification_id: "Notification#2" },
-    { name: "Notification 3", notification_id: "Notification#3" },
-    { name: "Notification 4", notification_id: "Notification#4" },
-    { name: "Notification 5", notification_id: "Notification#5" },
-  ],
-  result: [
-    { name: "Notification 1", notification_id: "Notification#1" },
-    { name: "Notification 2", notification_id: "Notification#2" },
-    { name: "Notification 3", notification_id: "Notification#3" },
-  ],
-  entrance: [
-    { name: "Notification 1", notification_id: "Notification#1" },
-    { name: "Notification 2", notification_id: "Notification#2" },
-  ],
-  answer: [
-    { name: "Notification 1", notification_id: "Notification#1" },
-  ]
-};
+interface ListViewNotification {
+  name: string;
+  notification_id: string;
+}
+
+interface GroupedNotifications {
+  [category: string]: ListViewNotification[];
+}
 
 const HomePage: React.FC = () => {
-  const handleItemClick = (item: { name: string; notification_id: string }) => {
+  const [grouped, setGrouped] = useState<GroupedNotifications>({});
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const apiResponse = await fetchHomePageNotifications();
+        setGrouped(apiResponse.data);
+      } catch (error) {
+        console.error("Failed to fetch homepage notifications", error);
+        setGrouped({});
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const handleItemClick = (item: ListViewNotification) => {
     alert(`Clicked on ${item.name} and ${item.notification_id}`);
   };
 
   return (
-    <div className='page'>
+    <div className="page">
       <div className="container py-4">
         <div className="row g-4">
-          {Object.entries(temp).map(([category, notifications]) => (
-            <div key={category} className="col-12 col-md-6 col-lg-4">
-              <div className="card h-100 shadow-sm">
-                <ListView
-                  title={category}
-                  items={notifications}
-                  onItemClick={handleItemClick}
-                />
+          {loading ? (
+            // Loading placeholder for entire page (optional)
+            <div className="text-center m-auto py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
             </div>
-          ))}
+          ) : (
+            Object.entries(grouped).map(([category, notifications]) => (
+              <div key={category} className="col-12 col-md-6 col-lg-4">
+                <div className="card h-100 shadow-sm">
+                  <ListView
+                    title={category}
+                    items={notifications}
+                    loading={loading}
+                    onItemClick={handleItemClick}
+                  />
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
