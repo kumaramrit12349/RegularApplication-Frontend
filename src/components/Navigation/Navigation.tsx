@@ -13,7 +13,7 @@ const Navigation: React.FC = () => {
   ];
 
   return (
-    <nav className="bg-light border-bottom shadow-sm sticky-top" style={{ top: '82px', zIndex: 1020 }}>
+    <nav className="bg-light border-bottom shadow-sm sticky-top" style={{ top: '74px', zIndex: 1020 }}>
       <div className="container">
         <div className="overflow-auto">
           <ul className="nav nav-pills py-2 flex-nowrap">

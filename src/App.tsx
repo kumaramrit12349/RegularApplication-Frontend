@@ -1,6 +1,5 @@
 // App.tsx
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './styles.css';
 import './App.css';
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
@@ -13,6 +12,7 @@ import Navbar from './components/Navbar/Navbar';
 import Navigation from './components/Navigation/Navigation';
 import SearchBar from './components/SearchBar/SearchBar';
 import Footer from './components/Footer/Footer';
+import CategoryView from './features/notifications/components/ListView/CategoryView';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
@@ -40,6 +40,9 @@ const AppLayout: React.FC = () => {
           <Route path="/admin/addNotification" element={<AddNotificationPage />} />
           <Route path="/admin/edit/:id" element={<EditNotificationPage />} />
           <Route path="/admin/review/:id" element={<ReviewNotificationPage />} />
+
+            {/* New route for infinite scroll per category */}
+          <Route path="/notification/category/:category" element={<CategoryView />} />
         </Routes>
       </main>
       

@@ -124,5 +124,14 @@ export const unarchiveNotification = async (id: string) => {
   return response.json();
 };
 
+// fetch notification by Category
+export const fetchNotificationsByCategory = async (category: string, page: number, limit: number) => {
+  const response = await fetch(
+    `${API_BASE_URL}/notification/category/${encodeURIComponent(category)}?page=${page}&limit=${limit}`
+  );
+  if (!response.ok) throw new Error("Failed to fetch notifications");
+  return await response.json();
+};
+
 
 
