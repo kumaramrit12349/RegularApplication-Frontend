@@ -1,20 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+const categories = [
+  { label: "All", value: "all" },
+  { label: "Jobs", value: "jobs" },
+  { label: "Results", value: "results" },
+  { label: "Admit Cards", value: "admit-card" },
+  { label: "Exams", value: "exams" },
+];
 
 interface SearchBarProps {
-  placeholder?: string;
   onSearch?: (query: string, filter: string) => void;
+  placeholder?: string;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-  placeholder = "Search notifications...",
   onSearch,
+  placeholder = "Search notifications...",
 }) => {
+  const { category: urlCategory } = useParams();
+  const navigate = useNavigate();
+
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
 
+  useEffect(() => {
+    if (urlCategory) {
+      setFilter(urlCategory);
+    } else {
+      setFilter("all");
+    }
+  }, [urlCategory]);
+
   const handleSearch = () => {
-    if (onSearch) {
-      onSearch(query, filter);
+    if (onSearch) onSearch(query, filter);
+    if (filter !== "all") {
+      navigate(`/notification/category/${filter}`);
+    } else {
+      navigate("/");
+    }
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setFilter(val);
+    setQuery("");
+    if (val !== "all") {
+      navigate(`/notification/category/${val}`);
+    } else {
+      navigate("/");
     }
   };
 
@@ -28,26 +62,26 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 className="form-select"
                 style={{ maxWidth: "150px" }}
                 value={filter}
-                onChange={(e) => setFilter(e.target.value)}
+                onChange={handleFilterChange}
               >
-                <option value="all">All</option>
-                <option value="jobs">Jobs</option>
-                <option value="results">Results</option>
-                <option value="admit-cards">Admit Cards</option>
-                <option value="exams">Exams</option>
+                {categories.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
               </select>
               <input
                 type="text"
                 className="form-control"
-                placeholder={placeholder}
                 value={query}
+                placeholder={placeholder}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               <button
                 className="btn btn-primary px-4"
-                type="button"
                 onClick={handleSearch}
+                type="button"
               >
                 Search
               </button>

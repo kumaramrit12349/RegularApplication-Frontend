@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { fetchNotificationsByCategory } from "../../../../services/api";
 import ListView from "./ListView";
+import { fetchNotificationsByCategory } from "../../../../services/api";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 interface Notification {
   name: string;
@@ -25,16 +25,20 @@ const CategoryView: React.FC = () => {
     setHasMore(true);
     setLoading(true);
     loadPage(1, true);
-    // eslint-disable-next-line
   }, [decodedCategory]);
 
   const loadPage = async (pg: number, isFirst = false) => {
     try {
-      const res = await fetchNotificationsByCategory(decodedCategory, pg, PAGE_SIZE);
+      // Replace with your actual API call
+      const res = await fetchNotificationsByCategory(
+        decodedCategory,
+        pg,
+        PAGE_SIZE
+      );
       if (isFirst) setItems(res.data);
-      else setItems(prev => [...prev, ...res.data]);
+      else setItems((prev) => [...prev, ...res.data]);
       setHasMore(res.hasMore);
-    } catch (err) {
+    } catch {
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -46,7 +50,10 @@ const CategoryView: React.FC = () => {
     <div className="container py-3 px-2 px-md-4">
       <div className="row justify-content-center">
         <div className="col-12 col-md-10 col-lg-8">
-          <h2 className="mb-3 text-center text-capitalize" style={{ fontSize: "1.6rem" }}>
+          <h2
+            className="mb-3 text-center text-capitalize"
+            style={{ fontSize: "1.6rem" }}
+          >
             Notifications: {decodedCategory.replace(/-/g, " ")}
           </h2>
           {loading && items.length === 0 ? (

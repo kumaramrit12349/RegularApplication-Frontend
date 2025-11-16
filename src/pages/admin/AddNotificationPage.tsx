@@ -39,11 +39,19 @@ const initialForm = {
   other_links: "",
 };
 
+const categories = [
+  { label: "All", value: "all" },
+  { label: "Jobs", value: "jobs" },
+  { label: "Results", value: "results" },
+  { label: "Admit Cards", value: "admit-card" },
+  { label: "Exams", value: "exams" },
+];
+
 const AddNotificationPage: React.FC = () => {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
+  const [success] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Confirmation modal state
@@ -133,11 +141,13 @@ const AddNotificationPage: React.FC = () => {
             required
           >
             <option value="">Select</option>
-            <option value="Job">Job</option>
-            <option value="Result">Result</option>
-            <option value="Exam">Exam</option>
-            <option value="Admit Card">Admit Card</option>
-            <option value="Answer Key">Answer Key</option>
+            {categories
+              .filter((c) => c.value !== "all") // (if you don't want "All" as a selectable form value)
+              .map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
           </select>
         </div>
 
