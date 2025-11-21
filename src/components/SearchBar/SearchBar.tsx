@@ -19,7 +19,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(urlCategory);
-
+  // When route/category changes, always reset filter and input
   useEffect(() => {
     setFilter(urlCategory);
     setQuery(""); // <- This clears search field every time category changes
@@ -50,11 +50,25 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-    // Clear search input and remove from URL/query params
+  // Handle input change: if cleared, remove searchValue from URL immediately
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value === "") {
+      if (filter !== "all") {
+        navigate(`/notification/category/${filter}`);
+      } else {
+        navigate(`/`);
+      }
+    }
+  };
+
+  // Handle (X) button clear
   const handleClearSearch = () => {
     setQuery("");
     if (filter !== "all") {
-      navigate(`/notification/category/${filter}`); // Remove searchValue from URL
+      navigate(`/notification/category/${filter}`);
     } else {
       navigate(`/`);
     }
@@ -83,7 +97,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 className="form-control"
                 value={query}
                 placeholder={placeholder}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={handleInputChange}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               {query && (
