@@ -2,7 +2,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, matchPath } from "react-router-dom";
 import HomePage from './pages/Home/HomePage';
 import DashboardPage from './pages/admin/DashboardPage';
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
@@ -13,10 +13,14 @@ import Navigation from './components/Navigation/Navigation';
 import SearchBar from './components/SearchBar/SearchBar';
 import Footer from './components/Footer/Footer';
 import CategoryView from './features/notifications/components/ListView/CategoryView';
+import UserNotificationDetailPage from './features/notifications/components/ListView/UserNotificationDetailPage';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const hideSearchBar =
+  matchPath("/notification/:id", location.pathname) !== null ||
+  matchPath("/admin/review/:id", location.pathname) !== null; // Optionally hide for admin too
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -27,7 +31,7 @@ const AppLayout: React.FC = () => {
       {!isAdminRoute && <Navigation />}
       
       {/* SearchBar - Only on public pages */}
-      {!isAdminRoute && <SearchBar />}
+      {!hideSearchBar && !isAdminRoute && <SearchBar />}
       
       {/* Main Content */}
       <main className="flex-grow-1">
@@ -43,6 +47,8 @@ const AppLayout: React.FC = () => {
 
             {/* New route for infinite scroll per category */}
           <Route path="/notification/category/:category" element={<CategoryView />} />
+
+          <Route path="/notification/:id" element={<UserNotificationDetailPage />} />
         </Routes>
       </main>
       
