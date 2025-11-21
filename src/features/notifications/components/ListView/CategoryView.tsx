@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ListView from "./ListView";
 import { fetchNotificationsByCategory } from "../../../../services/api";
@@ -11,9 +11,16 @@ interface Notification {
   notification_id: string;
 }
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 const CategoryView: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const decodedCategory = decodeURIComponent(category ?? "");
+  const query = useQuery();
+  const searchValue = query.get("searchValue") ?? "";
+
   const [items, setItems] = useState<Notification[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -25,15 +32,16 @@ const CategoryView: React.FC = () => {
     setHasMore(true);
     setLoading(true);
     loadPage(1, true);
-  }, [decodedCategory]);
+    // eslint-disable-next-line
+  }, [decodedCategory, searchValue]);
 
   const loadPage = async (pg: number, isFirst = false) => {
     try {
-      // Replace with your actual API call
       const res = await fetchNotificationsByCategory(
         decodedCategory,
         pg,
-        PAGE_SIZE
+        PAGE_SIZE,
+        searchValue
       );
       if (isFirst) setItems(res.data);
       else setItems((prev) => [...prev, ...res.data]);
@@ -55,6 +63,11 @@ const CategoryView: React.FC = () => {
             style={{ fontSize: "1.6rem" }}
           >
             Notifications: {decodedCategory.replace(/-/g, " ")}
+            {searchValue && (
+              <span className="text-muted ms-2" style={{ fontSize: "1rem" }}>
+                (Search: "{searchValue}")
+              </span>
+            )}
           </h2>
           {loading && items.length === 0 ? (
             <div className="text-center py-5">

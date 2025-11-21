@@ -13,35 +13,50 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  // Parse the category from the route manually for universal support
+
   const match = location.pathname.match(/\/notification\/category\/([^/]+)/i);
   const urlCategory = match ? decodeURIComponent(match[1]) : "all";
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(urlCategory);
 
-  // Sync filter dropdown with current route
   useEffect(() => {
     setFilter(urlCategory);
+    setQuery(""); // <- This clears search field every time category changes
   }, [urlCategory]);
 
   const handleSearch = () => {
     if (onSearch) onSearch(query, filter);
+    // Route should update, including search query in state
     if (filter !== "all") {
-      navigate(`/notification/category/${filter}`);
+      navigate(
+        `/notification/category/${filter}?searchValue=${encodeURIComponent(
+          query
+        )}`
+      );
+    } else {
+      navigate(`/?searchValue=${encodeURIComponent(query)}`);
+    }
+  };
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setFilter(val);
+    setQuery(""); // <- This resets the search input immediately on dropdown change
+    // Also navigate to category WITHOUT old search param:
+    if (val !== "all") {
+      navigate(`/notification/category/${val}`);
     } else {
       navigate("/");
     }
   };
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value;
-    setFilter(val);
+    // Clear search input and remove from URL/query params
+  const handleClearSearch = () => {
     setQuery("");
-    if (val !== "all") {
-      navigate(`/notification/category/${val}`);
+    if (filter !== "all") {
+      navigate(`/notification/category/${filter}`); // Remove searchValue from URL
     } else {
-      navigate("/");
+      navigate(`/`);
     }
   };
 
@@ -71,6 +86,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
+              {query && (
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  onClick={handleClearSearch}
+                  tabIndex={-1}
+                  style={{ zIndex: 2 }}
+                  aria-label="Clear search"
+                >
+                  &#x2715;
+                </button>
+              )}
               <button
                 className="btn btn-primary px-4"
                 onClick={handleSearch}

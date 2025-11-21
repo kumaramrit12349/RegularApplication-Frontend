@@ -125,10 +125,27 @@ export const unarchiveNotification = async (id: string) => {
 };
 
 // fetch notification by Category
-export const fetchNotificationsByCategory = async (category: string, page: number, limit: number) => {
+export const fetchNotificationsByCategory = async (
+  category: string,
+  page: number,
+  limit: number,
+  searchValue?: string
+) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  if (searchValue && searchValue.trim() !== "") {
+    params.append("searchValue", searchValue);
+  }
+
   const response = await fetch(
-    `${API_BASE_URL}/notification/category/${encodeURIComponent(category)}?page=${page}&limit=${limit}`
+    `${API_BASE_URL}/notification/category/${encodeURIComponent(
+      category
+    )}?${params}`
   );
+
   if (!response.ok) throw new Error("Failed to fetch notifications");
   return await response.json();
 };
