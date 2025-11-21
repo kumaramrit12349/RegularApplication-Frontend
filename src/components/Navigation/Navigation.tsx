@@ -1,28 +1,22 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { categories } from "../../features/notifications/services/notificationService";
 
-const navItems = [
-  { name: "Home", path: "/" },
-  { name: "Jobs", path: "/jobs" },
-  { name: "Admit Cards", path: "/admit-card" },
-  { name: "Results", path: "/results" },
-  { name: "Entrance Exams", path: "/entrance-exams" },
-];
 
 const Navigation: React.FC = () => {
   const location = useLocation();
-  // Manually extract category from path as string
   const match = location.pathname.match(/\/notification\/category\/([^/]+)/i);
-  const category = match ? decodeURIComponent(match[1]) : undefined;
+  const activeCategory = match ? decodeURIComponent(match[1]) : "all";
 
-  // For highlighting Admit Cards etc routes
-  const isActive = (path: string) => {
-    let isActive = false;
-    if (path === "/" && location.pathname === "/") return true;
-    if (path !== "/" && location.pathname.startsWith(path)) return true;
-    if (category && path.includes(category)) isActive = true;
-    console.log("isActive", isActive);
-    return isActive;
+  const isActive = (item: (typeof categories)[number]) => {
+    if (item.path === location.pathname) return true;
+    if (
+      activeCategory &&
+      item.value &&
+      activeCategory.toLowerCase() === item.value.toLowerCase()
+    )
+      return true;
+    return false;
   };
 
   return (
@@ -33,18 +27,18 @@ const Navigation: React.FC = () => {
       <div className="container">
         <div className="overflow-auto">
           <ul className="nav nav-pills py-2 flex-nowrap">
-            {navItems.map((item) => (
+            {categories.map((item) => (
               <li className="nav-item" key={item.path}>
                 <Link
                   to={item.path}
                   className={`nav-link text-nowrap ${
-                    isActive(item.path)
+                    isActive(item)
                       ? "active bg-primary text-white"
                       : "text-dark"
                   }`}
                   style={{ borderRadius: "8px", fontWeight: 500 }}
                 >
-                  {item.name}
+                  {item.label}
                 </Link>
               </li>
             ))}

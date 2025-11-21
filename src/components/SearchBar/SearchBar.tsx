@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-
-const categories = [
-  { label: "All", value: "all" },
-  { label: "Jobs", value: "jobs" },
-  { label: "Results", value: "results" },
-  { label: "Admit Cards", value: "admit-card" },
-  { label: "Exams", value: "exams" },
-];
+import { useNavigate, useLocation } from "react-router-dom";
+import { categories } from "../../features/notifications/services/notificationService";
 
 interface SearchBarProps {
   onSearch?: (query: string, filter: string) => void;
@@ -18,18 +11,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   placeholder = "Search notifications...",
 }) => {
-  const { category: urlCategory } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  // Parse the category from the route manually for universal support
+  const match = location.pathname.match(/\/notification\/category\/([^/]+)/i);
+  const urlCategory = match ? decodeURIComponent(match[1]) : "all";
 
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState(urlCategory);
 
+  // Sync filter dropdown with current route
   useEffect(() => {
-    if (urlCategory) {
-      setFilter(urlCategory);
-    } else {
-      setFilter("all");
-    }
+    setFilter(urlCategory);
   }, [urlCategory]);
 
   const handleSearch = () => {
