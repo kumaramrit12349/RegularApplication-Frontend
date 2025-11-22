@@ -1,41 +1,74 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getNotificationById, approveNotification } from "../../services/api";
+import {
+  getNotificationById,
+  approveNotification,
+} from "../../services/api";
 import NotificationDetailView from "../../components/Generic/NotificationDetailView";
+import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
+import Toast from "../../components/Toast/Toast";
 
 const ReviewNotificationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [notification, setNotification] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [approving, setApproving] = useState(false);
+
+  // Modal/Toast state - if you want to keep the UI unified with Dashboard
+  const [modal, setModal] = useState({
+    show: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    confirmText: "Confirm",
+    confirmVariant: "primary",
+  });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success" as "success" | "error" | "info" | "warning"
+  });
+
+  const showToast = (
+    msg: string,
+    type: "success" | "error" | "info" | "warning"
+  ) => setToast({ show: true, message: msg, type });
+
+  const loadNotification = async () => {
+    setLoading(true);
+    try {
+      const data = await getNotificationById(id!);
+      setNotification(data.notification);
+    } catch (err) {
+      showToast("Failed to load notification", "error");
+      setNotification(null);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (id) {
-      getNotificationById(id)
-        .then((data) => {
-          setNotification(data.notification);
-          setLoading(false);
-        })
-        .catch(() => {
-          alert("Failed to load notification");
-          navigate("/admin/dashboard");
-        });
-    }
-  }, [id, navigate]);
+    loadNotification();
+  }, [id]);
 
-  const handleApprove = async () => {
-    if (window.confirm("Are you sure you want to approve this notification?")) {
-      setApproving(true);
-      try {
-        await approveNotification(id!);
-        alert("Notification approved successfully!");
-        navigate("/admin/dashboard");
-      } catch (err: any) {
-        alert(err.message);
-        setApproving(false);
+  // Modal-action handlers
+  const handleApprove = (id: number) => {
+    setModal({
+      show: true,
+      title: "Approve Notification",
+      message: "Are you sure you want to approve this notification?",
+      confirmText: "Approve",
+      confirmVariant: "success",
+      onConfirm: async () => {
+        setModal((m) => ({ ...m, show: false }));
+        try {
+          await approveNotification(id.toString());
+          showToast("Notification approved successfully!", "success");
+          navigate("/admin/dashboard");
+        } catch (err: any) {
+          showToast(err.message || "Failed to approve notification", "error");
+        }
       }
-    }
+    });
   };
 
   if (loading) {
@@ -61,8 +94,25 @@ const ReviewNotificationPage: React.FC = () => {
       <NotificationDetailView
         notification={notification}
         isAdmin={true}
-        onApprove={handleApprove}
-        approving={approving}
+        // Pass all admin actions (the component will decide which to show)
+        onApprove={() => handleApprove(notification.id)}
+      />
+      {/* Toast */}
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })}
+      />
+      {/* Modal */}
+      <ConfirmModal
+        show={modal.show}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+        onCancel={() => setModal({ ...modal, show: false })}
+        confirmText={modal.confirmText}
+        confirmVariant={modal.confirmVariant}
       />
     </div>
   );

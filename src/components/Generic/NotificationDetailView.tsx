@@ -319,11 +319,11 @@ export default function NotificationDetailView({
                 value={formatDateTime(notification.updated_at)}
               />
               <LabelValue
-                label="Verified By:"
-                value={notification.verified_by}
+                label="Approved By:"
+                value={notification.approved_at}
               />
               <LabelValue
-                label="Approved By:"
+                label="Approved at:"
                 value={notification.approved_by}
               />
             </Card>
