@@ -374,7 +374,7 @@ const EditNotificationPage: React.FC = () => {
         <div className="mt-4">
           <button
             type="submit"
-            className="btn btn-primary btn-lg"
+            className="btn btn-primary"
             disabled={saving}
           >
             {saving ? "Updating..." : "Update Notification"}
