@@ -151,4 +151,44 @@ export const fetchNotificationsByCategory = async (
 };
 
 
+export const signUpUser = async (
+  given_name: string,
+  family_name: string,
+  email: string,
+  password: string,
+  gender: string
+) => {
+  const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ given_name, family_name, email, password, gender }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to sign up");
+  }
+  return await response.json();
+};
+
+
+export const loginUser = async (
+  email: string,
+  password: string
+) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to login");
+  }
+  return await response.json();
+};
+
+
+
 
