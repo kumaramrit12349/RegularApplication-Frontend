@@ -181,7 +181,8 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
         </div>
 
         {/* SSO Main Button */}
-        <Button
+        {/* ----------------------------will implement it letter------------------------------- */}
+        {/* <Button
           variant="light"
           className="w-100 py-2 my-2 mb-1 d-flex align-items-center justify-content-center border"
           style={{
@@ -199,7 +200,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
             style={{ height: 28, width: 28 }}
           />
           Continue with Google
-        </Button>
+        </Button> */}
 
         {/* SSO options row */}
         <div className="d-flex justify-content-center my-2" style={{ gap: 20 }}>
