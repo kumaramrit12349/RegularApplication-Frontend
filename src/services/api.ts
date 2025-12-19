@@ -172,13 +172,11 @@ export const signUpUser = async (
 };
 
 
-export const loginUser = async (
-  email: string,
-  password: string
-) => {
+export const loginUser = async (email: string, password: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/signin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // crucial for cookies
     body: JSON.stringify({ email, password }),
   });
 
@@ -186,9 +184,27 @@ export const loginUser = async (
     const err = await response.json().catch(() => ({}));
     throw new Error(err.message || "Failed to login");
   }
-  return await response.json();
+
+  return response.json();
 };
 
 
 
+export const logoutUser = async () => {
+  await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+};
+
+export const checkAuthStatus = async (): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      credentials: "include", // REQUIRED
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
 

@@ -16,27 +16,27 @@ const SSO_PROVIDERS = [
     name: "Telegram",
     icon: "https://img.icons8.com/color/28/000000/telegram-app.png",
     url: "https://t.me/",
-  }, // Add your telegram channel/user
+  },
   {
     name: "WhatsApp",
     icon: "https://img.icons8.com/color/28/000000/whatsapp.png",
     url: "https://wa.me/",
-  }, // Add your wa link
+  },
   {
     name: "YouTube",
     icon: "https://img.icons8.com/color/28/000000/youtube-play.png",
     url: "https://youtube.com/",
-  }, // Add your channel link
+  },
   {
     name: "Instagram",
     icon: "https://img.icons8.com/color/28/000000/instagram-new.png",
     url: "https://instagram.com/",
-  }, // Add yours
+  },
   {
     name: "X",
     icon: "https://img.icons8.com/ios-filled/28/000000/twitterx--v2.png",
     url: "https://x.com/",
-  }, // Add your X handle
+  },
 ];
 
 type AuthTab = "login" | "register";
@@ -44,7 +44,7 @@ type AuthTab = "login" | "register";
 interface AuthPopupProps {
   show: boolean;
   onClose: () => void;
-  onAuthSuccess: (user: any) => void;
+  onAuthSuccess?: () => void; // Optional - no user data needed with cookies
 }
 
 const AuthPopup: React.FC<AuthPopupProps> = ({
@@ -76,40 +76,40 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
-  try {
-    let data;
-    if (tab === "login") {
-      data = await loginUser(form.email, form.password);
-    } else {
-      data = await signUpUser(
-        form.given_name,
-        form.family_name,
-        form.email,
-        form.password,
-        form.gender
-      );
-    }
-    onAuthSuccess(data.user);
-    setLoading(false);
-    onClose();
-  } catch (err: any) {
-    setError(err?.message || "Authentication failed");
-    setLoading(false);
-  }
-};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
+    try {
+      if (tab === "login") {
+        await loginUser(form.email, form.password); // Cookies set automatically
+      } else {
+        await signUpUser(
+          form.given_name,
+          form.family_name,
+          form.email,
+          form.password,
+          form.gender
+        );
+      }
+      
+      // Success - cookies handle session persistence
+      onAuthSuccess?.(); // Optional callback
+      onClose();
+    } catch (err: any) {
+      setError(err?.message || (tab === "login" ? "Login failed" : "Registration failed"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSSO = (providerUrl: string) => {
     window.open(providerUrl, "_blank", "noopener");
   };
 
   const handleForgotPassword = () => {
-    // Replace with your forgot password route if needed
-    window.open(API_BASE_URL + "/forgot-password", "_blank");
+    window.open(`${API_BASE_URL}/forgot-password`, "_blank");
   };
 
   return (
@@ -175,6 +175,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           />
           Continue with Google
         </Button>
+        
         {/* SSO options row */}
         <div className="d-flex justify-content-center my-2" style={{ gap: 20 }}>
           {SSO_PROVIDERS.slice(1).map((p) => (
@@ -240,6 +241,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               required
             />
           </div>
+          
           {/* First and Last Name (Register only) */}
           {tab === "register" && (
             <div className="row">
@@ -313,9 +315,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 Forgot Password
               </a>
             )}
-            {/* Empty column for spacing if register */}
             {tab === "register" && <span />}
           </div>
+          
           <Button
             type="submit"
             variant="primary"
@@ -337,24 +339,11 @@ const handleSubmit = async (e: React.FormEvent) => {
               : "Sign Up"}
           </Button>
         </form>
-        {error && <div className="text-danger mt-3 text-center">{error}</div>}
+        
+        {error && (
+          <div className="text-danger mt-3 text-center fs-6">{error}</div>
+        )}
       </Modal.Body>
-      <Modal.Footer className="mx-auto justify-content-center flex-column border-0 pt-0">
-        <div
-          className="text-center text-muted my-1"
-          style={{ fontSize: "0.97em" }}
-        >
-          By creating this account, you agree to our{" "}
-          <a href="/privacy" target="_blank" rel="noopener noreferrer">
-            Privacy Policy
-          </a>{" "}
-          &nbsp;|&nbsp;{" "}
-          <a href="/cookie" target="_blank" rel="noopener noreferrer">
-            Cookie Policy
-          </a>
-          .
-        </div>
-      </Modal.Footer>
     </Modal>
   );
 };

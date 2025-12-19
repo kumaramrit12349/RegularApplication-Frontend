@@ -1,53 +1,80 @@
-// App.tsx
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
 import React, { useEffect, useState, useRef } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, matchPath } from "react-router-dom";
-import HomePage from './pages/Home/HomePage';
-import DashboardPage from './pages/admin/DashboardPage';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  matchPath,
+} from "react-router-dom";
+import HomePage from "./pages/Home/HomePage";
+import DashboardPage from "./pages/admin/DashboardPage";
 import AddNotificationPage from "./pages/admin/AddNotificationPage";
-import EditNotificationPage from './pages/admin/EditNotificationPage';
-import ReviewNotificationPage from './pages/admin/ReviewNotificationPage';
-import Navbar from './components/Navbar/Navbar';
-import Navigation from './components/Navigation/Navigation';
-import SearchBar from './components/SearchBar/SearchBar';
-import Footer from './components/Footer/Footer';
-import CategoryView from './features/notifications/components/ListView/CategoryView';
-import UserNotificationDetailPage from './features/notifications/components/ListView/UserNotificationDetailPage';
-import SignUpPopup from './components/SignUpPopup';
+import EditNotificationPage from "./pages/admin/EditNotificationPage";
+import ReviewNotificationPage from "./pages/admin/ReviewNotificationPage";
+import Navbar from "./components/Navbar/Navbar";
+import Navigation from "./components/Navigation/Navigation";
+import SearchBar from "./components/SearchBar/SearchBar";
+import Footer from "./components/Footer/Footer";
+import CategoryView from "./features/notifications/components/ListView/CategoryView";
+import UserNotificationDetailPage from "./features/notifications/components/ListView/UserNotificationDetailPage";
+import SignUpPopup from "./components/SignUpPopup";
+import { checkAuthStatus, logoutUser } from "./services/api";
 
-const POPUP_INTERVAL = 90 * 1000; // 90 seconds
+const POPUP_INTERVAL = 90 * 1000;
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith("/admin");
   const hideSearchBar =
     matchPath("/notification/:id", location.pathname) !== null ||
     matchPath("/admin/review/:id", location.pathname) !== null;
-
-  // --- AUTH POPUP LOGIC START ---
-  // Substitute/use your own auth logic if you have a context/provider
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    !!localStorage.getItem("token")
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setShowPopup(true); // auto show on first load
-      timerRef.current = setInterval(() => setShowPopup(true), POPUP_INTERVAL);
-      return () => { if (timerRef.current) clearInterval(timerRef.current); };
-    }
-  }, [isAuthenticated]);
+    const verifyAuth = async () => {
+      const authStatus = await checkAuthStatus();
+      setIsAuthenticated(authStatus);
+      setCheckingAuth(false);
 
-  const handleAuthSuccess = (user: any) => {
+      if (!authStatus) {
+        setShowPopup(true);
+        timerRef.current = setInterval(
+          () => setShowPopup(true),
+          POPUP_INTERVAL
+        );
+      }
+    };
+
+    verifyAuth();
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const handleAuthSuccess = () => {
     setIsAuthenticated(true);
     setShowPopup(false);
-    // Save auth token for session persistence if not handled elsewhere
-    if (user.token) localStorage.setItem("token", user.token);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
-  // --- AUTH POPUP LOGIC END ---
+
+  if (checkingAuth) {
+    return (
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -56,20 +83,28 @@ const AppLayout: React.FC = () => {
       {!hideSearchBar && !isAdminRoute && <SearchBar />}
       <main className="flex-grow-1">
         <Routes>
-          {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
-          {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<DashboardPage />} />
-          <Route path="/admin/addNotification" element={<AddNotificationPage />} />
+          <Route
+            path="/admin/addNotification"
+            element={<AddNotificationPage />}
+          />
           <Route path="/admin/edit/:id" element={<EditNotificationPage />} />
-          <Route path="/admin/review/:id" element={<ReviewNotificationPage />} />
-          {/* New route for infinite scroll per category */}
-          <Route path="/notification/category/:category" element={<CategoryView />} />
-          <Route path="/notification/:id" element={<UserNotificationDetailPage />} />
+          <Route
+            path="/admin/review/:id"
+            element={<ReviewNotificationPage />}
+          />
+          <Route
+            path="/notification/category/:category"
+            element={<CategoryView />}
+          />
+          <Route
+            path="/notification/:id"
+            element={<UserNotificationDetailPage />}
+          />
         </Routes>
       </main>
       <Footer />
-      {/* The popup goes here, shown only if NOT authenticated */}
       <SignUpPopup
         show={showPopup && !isAuthenticated}
         onClose={() => setShowPopup(false)}
@@ -79,13 +114,10 @@ const AppLayout: React.FC = () => {
   );
 };
 
-
-const App: React.FC = () => {
-  return (
-    <Router>
-      <AppLayout />
-    </Router>
-  );
-};
+const App: React.FC = () => (
+  <Router>
+    <AppLayout />
+  </Router>
+);
 
 export default App;
