@@ -208,3 +208,31 @@ export const checkAuthStatus = async (): Promise<boolean> => {
   }
 };
 
+export const verifyAccount = async (email: string, code: string) => {
+  const res = await fetch(`${API_BASE_URL}/auth/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to verify account");
+  }
+  return res.json();
+};
+
+export const resendVerificationCode = async (email: string) => {
+  const res = await fetch(`${API_BASE_URL}/auth/resend-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to resend verification code");
+  }
+  return res.json();
+};
+

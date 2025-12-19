@@ -20,7 +20,8 @@ import Footer from "./components/Footer/Footer";
 import CategoryView from "./features/notifications/components/ListView/CategoryView";
 import UserNotificationDetailPage from "./features/notifications/components/ListView/UserNotificationDetailPage";
 import SignUpPopup from "./components/SignUpPopup";
-import { checkAuthStatus, logoutUser } from "./services/api";
+import { checkAuthStatus } from "./services/api";
+import VerifyAccountPopup from "./components/VerifyAccount";
 
 const POPUP_INTERVAL = 90 * 1000;
 
@@ -30,21 +31,27 @@ const AppLayout: React.FC = () => {
   const hideSearchBar =
     matchPath("/notification/:id", location.pathname) !== null ||
     matchPath("/admin/review/:id", location.pathname) !== null;
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [showVerifyPopup, setShowVerifyPopup] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string>("");
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Check auth status on first load (persists login via cookies)
   useEffect(() => {
     const verifyAuth = async () => {
-      const authStatus = await checkAuthStatus();
+      const authStatus = await checkAuthStatus(); // calls /api/auth/me with cookies
       setIsAuthenticated(authStatus);
       setCheckingAuth(false);
 
       if (!authStatus) {
-        setShowPopup(true);
+        setShowAuthPopup(true);
         timerRef.current = setInterval(
-          () => setShowPopup(true),
+          () => setShowAuthPopup(true),
           POPUP_INTERVAL
         );
       }
@@ -59,11 +66,19 @@ const AppLayout: React.FC = () => {
 
   const handleAuthSuccess = () => {
     setIsAuthenticated(true);
-    setShowPopup(false);
+    setShowAuthPopup(false);
+    setShowVerifyPopup(false);
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+  };
+
+  // Called when backend says "User is not confirmed"
+  const handleRequireVerification = (email: string) => {
+    setPendingEmail(email);
+    setShowAuthPopup(false);
+    setShowVerifyPopup(true);
   };
 
   if (checkingAuth) {
@@ -81,6 +96,7 @@ const AppLayout: React.FC = () => {
       <Navbar />
       {!isAdminRoute && <Navigation />}
       {!hideSearchBar && !isAdminRoute && <SearchBar />}
+
       <main className="flex-grow-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -104,11 +120,23 @@ const AppLayout: React.FC = () => {
           />
         </Routes>
       </main>
+
       <Footer />
+
+      {/* Auth (login/register) popup */}
       <SignUpPopup
-        show={showPopup && !isAuthenticated}
-        onClose={() => setShowPopup(false)}
+        show={showAuthPopup && !isAuthenticated}
+        onClose={() => setShowAuthPopup(false)}
         onAuthSuccess={handleAuthSuccess}
+        onRequireVerification={handleRequireVerification}
+      />
+
+      {/* Account verification popup (email + OTP) */}
+      <VerifyAccountPopup
+        show={showVerifyPopup && !isAuthenticated}
+        email={pendingEmail}
+        onClose={() => setShowVerifyPopup(false)}
+        onVerified={handleAuthSuccess}
       />
     </div>
   );

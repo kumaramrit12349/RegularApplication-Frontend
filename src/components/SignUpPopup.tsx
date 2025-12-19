@@ -44,13 +44,15 @@ type AuthTab = "login" | "register";
 interface AuthPopupProps {
   show: boolean;
   onClose: () => void;
-  onAuthSuccess?: () => void; // Optional - no user data needed with cookies
+  onAuthSuccess?: () => void;
+  onRequireVerification?: (email: string) => void; // <--- add this
 }
 
 const AuthPopup: React.FC<AuthPopupProps> = ({
   show,
   onClose,
   onAuthSuccess,
+  onRequireVerification,
 }) => {
   const [tab, setTab] = useState<AuthTab>("login");
   const [form, setForm] = useState({
@@ -84,7 +86,10 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
     try {
       if (tab === "login") {
         await loginUser(form.email, form.password); // Cookies set automatically
+        onAuthSuccess?.();
+        onClose();
       } else {
+        // REGISTER FLOW
         await signUpUser(
           form.given_name,
           form.family_name,
@@ -92,13 +97,30 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
           form.password,
           form.gender
         );
+
+        // After signup, require verification instead of auto-login
+        if (onRequireVerification) {
+          onRequireVerification(form.email); // open VerifyAccountPopup in parent
+        }
+
+        // Optionally show a small message in this modal before closing (toast etc.)
+        onClose();
       }
-      
-      // Success - cookies handle session persistence
-      onAuthSuccess?.(); // Optional callback
-      onClose();
     } catch (err: any) {
-      setError(err?.message || (tab === "login" ? "Login failed" : "Registration failed"));
+      const msg =
+        err?.message ||
+        (tab === "login" ? "Login failed" : "Registration failed");
+
+      if (
+        tab === "login" &&
+        msg.toLowerCase().includes("not confirmed") &&
+        onRequireVerification
+      ) {
+        // login but user not confirmed
+        onRequireVerification(form.email);
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -175,7 +197,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
           />
           Continue with Google
         </Button>
-        
+
         {/* SSO options row */}
         <div className="d-flex justify-content-center my-2" style={{ gap: 20 }}>
           {SSO_PROVIDERS.slice(1).map((p) => (
@@ -241,7 +263,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
               required
             />
           </div>
-          
+
           {/* First and Last Name (Register only) */}
           {tab === "register" && (
             <div className="row">
@@ -317,7 +339,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
             )}
             {tab === "register" && <span />}
           </div>
-          
+
           <Button
             type="submit"
             variant="primary"
@@ -339,7 +361,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
               : "Sign Up"}
           </Button>
         </form>
-        
+
         {error && (
           <div className="text-danger mt-3 text-center fs-6">{error}</div>
         )}
