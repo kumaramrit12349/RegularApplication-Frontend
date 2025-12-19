@@ -47,6 +47,16 @@ export interface NotificationFormData {
   other_links: string;
 }
 
+export interface AuthStatus {
+  isAuthenticated: boolean;
+  user?: {
+    given_name?: string;
+    family_name?: string;
+    email?: string;
+    sub?: string;
+  };
+}
+
 // Add notification with all related data
 export const addNotification = async (data: NotificationFormData) => {
   const response = await fetch(`${API_BASE_URL}/notification/add`, {
@@ -197,17 +207,6 @@ export const logoutUser = async () => {
   });
 };
 
-export const checkAuthStatus = async (): Promise<boolean> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
-      credentials: "include", // REQUIRED
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
-};
-
 export const verifyAccount = async (email: string, code: string) => {
   const res = await fetch(`${API_BASE_URL}/auth/confirm`, {
     method: "POST",
@@ -234,5 +233,23 @@ export const resendVerificationCode = async (email: string) => {
     throw new Error(err.message || "Failed to resend verification code");
   }
   return res.json();
+};
+
+export const checkAuthStatus = async (): Promise<AuthStatus> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      credentials: "include",
+    });
+
+    if (!res.ok) return { isAuthenticated: false };
+
+    const data = await res.json();
+    return {
+      isAuthenticated: true,
+      user: data.user,
+    };
+  } catch {
+    return { isAuthenticated: false };
+  }
 };
 

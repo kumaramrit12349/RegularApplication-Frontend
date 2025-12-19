@@ -40,20 +40,29 @@ const AppLayout: React.FC = () => {
   const [showVerifyPopup, setShowVerifyPopup] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string>("");
 
-  // Optional: you can fill these from /auth/me later
-  const [userName] = useState<string | undefined>(undefined);
-  const [userEmail] = useState<string | undefined>(undefined);
+  const [givenName, setGivenName] = useState<string | undefined>(undefined);
+  const [familyName, setFamilyName] = useState<string | undefined>(undefined);
+  const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Check auth status on first load
   useEffect(() => {
     const verifyAuth = async () => {
-      const authStatus = await checkAuthStatus();
-      setIsAuthenticated(authStatus);
+      const { isAuthenticated, user } = await checkAuthStatus();
+      setIsAuthenticated(isAuthenticated);
+      if (isAuthenticated && user) {
+        setGivenName(user.given_name);
+        setFamilyName(user.family_name);
+        setUserEmail(user.email);
+      } else {
+        setGivenName(undefined);
+        setFamilyName(undefined);
+        setUserEmail(undefined);
+      }
       setCheckingAuth(false);
 
-      if (!authStatus) {
+      if (!isAuthenticated) {
         setShowAuthPopup(true);
         timerRef.current = setInterval(
           () => setShowAuthPopup(true),
@@ -69,8 +78,17 @@ const AppLayout: React.FC = () => {
     };
   }, []);
 
-  const handleAuthSuccess = () => {
-    setIsAuthenticated(true);
+  const handleAuthSuccess = async () => {
+    // immediately fetch user info after login
+    const { isAuthenticated, user } = await checkAuthStatus();
+    setIsAuthenticated(isAuthenticated);
+
+    if (isAuthenticated && user) {
+      setGivenName(user.given_name);
+      setFamilyName(user.family_name);
+      setUserEmail(user.email);
+    }
+
     setShowAuthPopup(false);
     setShowVerifyPopup(false);
     if (timerRef.current) {
@@ -78,7 +96,6 @@ const AppLayout: React.FC = () => {
       timerRef.current = null;
     }
   };
-
   const handleRequireVerification = (email: string) => {
     setPendingEmail(email);
     setShowAuthPopup(false);
@@ -116,7 +133,8 @@ const AppLayout: React.FC = () => {
     <div className="d-flex flex-column min-vh-100">
       <Navbar
         isAuthenticated={isAuthenticated}
-        userName={userName}
+        givenName={givenName}
+        familyName={familyName}
         userEmail={userEmail}
         onLogout={handleLogout}
         onShowAuthPopup={() => setShowAuthPopup(true)}

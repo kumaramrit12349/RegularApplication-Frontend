@@ -5,7 +5,8 @@ import ProfileSection from "../../features/notifications/components/ListView/Pro
 
 interface NavbarProps {
   isAuthenticated: boolean;
-  userName?: string;
+  givenName?: string;
+  familyName?: string;
   userEmail?: string;
   onLogout: () => void;
   onShowAuthPopup: () => void;
@@ -13,7 +14,8 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({
   isAuthenticated,
-  userName,
+  givenName,
+  familyName,
   userEmail,
   onLogout,
   onShowAuthPopup,
@@ -54,7 +56,8 @@ const Navbar: React.FC<NavbarProps> = ({
           <ul className="navbar-nav align-items-lg-center">
             <ProfileSection
               isAuthenticated={isAuthenticated}
-              name={userName}
+              givenName={givenName}
+              familyName={familyName}
               email={userEmail}
               onLogout={onLogout}
               onShowAuthPopup={onShowAuthPopup}

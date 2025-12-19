@@ -3,15 +3,17 @@ import { Link } from "react-router-dom";
 
 interface ProfileSectionProps {
   isAuthenticated: boolean;
-  name?: string;
+  givenName?: string;
+  familyName?: string;
   email?: string;
   onLogout: () => void;
-  onShowAuthPopup: () => void; // open login/sign-up popup
+  onShowAuthPopup: () => void;
 }
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({
   isAuthenticated,
-  name,
+  givenName,
+  familyName,
   email,
   onLogout,
   onShowAuthPopup,
@@ -19,7 +21,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -29,17 +30,21 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         setOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const displayName = name || "Guest User";
+  // For initials: first letter of given_name + first letter of family_name
+  const firstInitial = givenName?.trim()?.[0]?.toUpperCase() || "";
+  const lastInitial = familyName?.trim()?.[0]?.toUpperCase() || "";
+  const initials =
+    (firstInitial + lastInitial) || "👤";
+
+  const fullName =
+    [givenName, familyName].filter(Boolean).join(" ") || "Guest User";
   const displayEmail = email || "";
-  const initial = displayName?.[0]?.toUpperCase() || "👤";
 
   if (!isAuthenticated) {
-    // Not logged in → show Login & Sign up buttons
     return (
       <>
         <li className="nav-item me-2">
@@ -62,7 +67,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     );
   }
 
-  // Logged in → show profile dropdown
   return (
     <li className="nav-item dropdown position-relative" ref={dropdownRef}>
       <button
@@ -74,9 +78,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           className="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
           style={{ width: "35px", height: "35px" }}
         >
-          <span style={{ fontSize: "18px" }}>{initial}</span>
+          <span style={{ fontSize: "16px", fontWeight: 600 }}>{initials}</span>
         </div>
-        <span className="d-none d-md-inline me-1">Profile</span>
+        <span className="d-none d-md-inline me-1">{fullName}</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="12"
@@ -100,17 +104,16 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             zIndex: 1031,
           }}
         >
-          {/* Profile header */}
           <div className="px-3 py-3 border-bottom">
             <div className="d-flex align-items-center">
               <div
                 className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
-                style={{ width: "50px", height: "50px", fontSize: "24px" }}
+                style={{ width: "50px", height: "50px", fontSize: "20px", fontWeight: 600 }}
               >
-                {initial}
+                {initials}
               </div>
               <div>
-                <div className="fw-semibold">{displayName}</div>
+                <div className="fw-semibold">{fullName}</div>
                 {displayEmail && (
                   <div className="text-muted small">{displayEmail}</div>
                 )}
@@ -118,7 +121,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
             </div>
           </div>
 
-          {/* Menu items */}
           <ul className="list-unstyled mb-0">
             <li>
               <Link
