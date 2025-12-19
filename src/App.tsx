@@ -8,6 +8,7 @@ import {
   Route,
   useLocation,
   matchPath,
+  Navigate,
 } from "react-router-dom";
 import HomePage from "./pages/Home/HomePage";
 import DashboardPage from "./pages/admin/DashboardPage";
@@ -23,6 +24,7 @@ import UserNotificationDetailPage from "./features/notifications/components/List
 import SignUpPopup from "./components/SignUpPopup";
 import { checkAuthStatus, logoutUser } from "./services/api";
 import VerifyAccountPopup from "./components/VerifyAccount";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 const POPUP_INTERVAL = 90 * 1000;
 
@@ -146,16 +148,54 @@ const AppLayout: React.FC = () => {
       <main className="flex-grow-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/admin/dashboard" element={<DashboardPage />} />
+
+          {/* Admin routes – protected */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                checkingAuth={checkingAuth}
+              >
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin/addNotification"
-            element={<AddNotificationPage />}
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                checkingAuth={checkingAuth}
+              >
+                <AddNotificationPage />
+              </ProtectedRoute>
+            }
           />
-          <Route path="/admin/edit/:id" element={<EditNotificationPage />} />
+          <Route
+            path="/admin/edit/:id"
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                checkingAuth={checkingAuth}
+              >
+                <EditNotificationPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin/review/:id"
-            element={<ReviewNotificationPage />}
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                checkingAuth={checkingAuth}
+              >
+                <ReviewNotificationPage />
+              </ProtectedRoute>
+            }
           />
+
+          {/* Public routes */}
           <Route
             path="/notification/category/:category"
             element={<CategoryView />}
@@ -164,6 +204,9 @@ const AppLayout: React.FC = () => {
             path="/notification/:id"
             element={<UserNotificationDetailPage />}
           />
+
+          {/* Catch‑all: wrong URL → home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
 
