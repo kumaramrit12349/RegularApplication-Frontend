@@ -3,7 +3,6 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { loginUser, signUpUser } from "../services/api";
 
-// Replace with your API URL
 const API_BASE_URL = "http://localhost:3000";
 
 const SSO_PROVIDERS = [
@@ -45,7 +44,7 @@ interface AuthPopupProps {
   show: boolean;
   onClose: () => void;
   onAuthSuccess?: () => void;
-  onRequireVerification?: (email: string) => void; // <--- add this
+  onRequireVerification?: (email: string) => void;
 }
 
 const AuthPopup: React.FC<AuthPopupProps> = ({
@@ -68,7 +67,16 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
   const swapTab = (next: AuthTab) => {
     setTab(next);
     setError("");
-    setForm((f) => ({ ...f, password: "" }));
+    // do NOT clear email/password here; let browser autofill work
+    if (next === "register") {
+      // optional: clear only registration fields
+      setForm((f) => ({
+        ...f,
+        given_name: "",
+        family_name: "",
+        gender: "",
+      }));
+    }
   };
 
   const handleInput = (
@@ -85,11 +93,10 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
 
     try {
       if (tab === "login") {
-        await loginUser(form.email, form.password); // Cookies set automatically
+        await loginUser(form.email, form.password); // cookies set
         onAuthSuccess?.();
         onClose();
       } else {
-        // REGISTER FLOW
         await signUpUser(
           form.given_name,
           form.family_name,
@@ -98,12 +105,9 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
           form.gender
         );
 
-        // After signup, require verification instead of auto-login
         if (onRequireVerification) {
-          onRequireVerification(form.email); // open VerifyAccountPopup in parent
+          onRequireVerification(form.email);
         }
-
-        // Optionally show a small message in this modal before closing (toast etc.)
         onClose();
       }
     } catch (err: any) {
@@ -116,7 +120,6 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
         msg.toLowerCase().includes("not confirmed") &&
         onRequireVerification
       ) {
-        // login but user not confirmed
         onRequireVerification(form.email);
       } else {
         setError(msg);
@@ -228,22 +231,23 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
         <hr className="my-3" />
 
         {/* FORM */}
-        <form onSubmit={handleSubmit} autoComplete="off">
+        <form onSubmit={handleSubmit} autoComplete="on">
           {/* Email and Password always present */}
           <div className="mb-3">
             <label className="form-label fw-semibold" htmlFor="email">
-              Username or Email
+              Email
             </label>
             <input
               id="email"
               className="form-control bg-body-tertiary"
               style={{ borderRadius: 10, fontSize: "1.08em" }}
-              placeholder="Username or Email"
+              placeholder="Email"
               name="email"
               value={form.email}
               onChange={handleInput}
               type="email"
               required
+              autoComplete={tab === "login" ? "email" : "email"}
               autoFocus
             />
           </div>
@@ -261,6 +265,9 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
               onChange={handleInput}
               type="password"
               required
+              autoComplete={
+                tab === "login" ? "current-password" : "new-password"
+              }
             />
           </div>
 
