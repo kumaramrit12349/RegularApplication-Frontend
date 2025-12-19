@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 interface ProfileSectionProps {
   isAuthenticated: boolean;
@@ -34,11 +34,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // For initials: first letter of given_name + first letter of family_name
   const firstInitial = givenName?.trim()?.[0]?.toUpperCase() || "";
   const lastInitial = familyName?.trim()?.[0]?.toUpperCase() || "";
-  const initials =
-    (firstInitial + lastInitial) || "👤";
+  const initials = (firstInitial + lastInitial) || "👤";
 
   const fullName =
     [givenName, familyName].filter(Boolean).join(" ") || "Guest User";
@@ -69,18 +67,35 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
   return (
     <li className="nav-item dropdown position-relative" ref={dropdownRef}>
+      {/* Toggle button (works for desktop + mobile) */}
       <button
+        type="button"
         className="btn btn-link nav-link d-flex align-items-center text-white text-decoration-none p-0"
         onClick={() => setOpen(!open)}
         style={{ cursor: "pointer", border: "none", background: "none" }}
       >
+        {/* Small circular avatar */}
         <div
-          className="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
-          style={{ width: "35px", height: "35px" }}
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            backgroundColor: "#0d6efd",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 16,
+            fontWeight: 600,
+            flexShrink: 0,
+          }}
         >
-          <span style={{ fontSize: "16px", fontWeight: 600 }}>{initials}</span>
+          {initials}
         </div>
-        <span className="d-none d-md-inline me-1">{fullName}</span>
+
+        {/* Hide name on very small screens */}
+        <span className="d-none d-md-inline ms-2 me-1">{fullName}</span>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="12"
@@ -94,21 +109,26 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
 
       {open && (
         <div
-          className="dropdown-menu dropdown-menu-end show"
-          style={{
-            position: "absolute",
-            right: 0,
-            top: "100%",
-            minWidth: "280px",
-            marginTop: "8px",
-            zIndex: 1031,
-          }}
+          className="dropdown-menu dropdown-menu-end show profile-dropdown"
         >
           <div className="px-3 py-3 border-bottom">
             <div className="d-flex align-items-center">
+              {/* Large circular avatar in panel */}
               <div
-                className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
-                style={{ width: "50px", height: "50px", fontSize: "20px", fontWeight: 600 }}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  backgroundColor: "#0d6efd",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 22,
+                  fontWeight: 600,
+                  flexShrink: 0,
+                }}
+                className="me-3"
               >
                 {initials}
               </div>
@@ -122,27 +142,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           </div>
 
           <ul className="list-unstyled mb-0">
-            <li>
-              <Link
-                className="dropdown-item py-2"
-                to="/profile"
-                onClick={() => setOpen(false)}
-              >
-                My Account
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="dropdown-item py-2"
-                to="/settings"
-                onClick={() => setOpen(false)}
-              >
-                Settings
-              </Link>
-            </li>
-            <li>
-              <hr className="dropdown-divider" />
-            </li>
+            {/* Add items here later if needed */}
             <li>
               <button
                 className="dropdown-item py-2 text-danger"
