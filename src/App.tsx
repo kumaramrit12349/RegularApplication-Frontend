@@ -48,7 +48,7 @@ const AppLayout: React.FC = () => {
       setIsAuthenticated(authStatus);
       setCheckingAuth(false);
 
-      if (!authStatus) {
+      if (!authStatus && !showVerifyPopup) {
         setShowAuthPopup(true);
         timerRef.current = setInterval(
           () => setShowAuthPopup(true),
@@ -79,6 +79,11 @@ const AppLayout: React.FC = () => {
     setPendingEmail(email);
     setShowAuthPopup(false);
     setShowVerifyPopup(true);
+    // Stop the periodic popup while user is verifying
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
   if (checkingAuth) {
