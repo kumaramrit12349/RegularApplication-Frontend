@@ -1,7 +1,7 @@
 // Navbar.tsx
 import React from "react";
 import { Link } from "react-router-dom";
-import ProfileSection from "../../features/notifications/components/ListView/ProfileSection";
+import ProfileSection from "../../features/notifications/components/ProfileSection";
 
 interface NavbarProps {
   isAuthenticated: boolean;

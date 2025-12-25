@@ -475,7 +475,7 @@ html, body, #root {
   position: absolute;
   right: 0;
   top: 100%;
-  min-width: 280px;
+  min-width: 320px;
   margin-top: 8px;
   z-index: 1031;
 }

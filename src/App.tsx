@@ -19,12 +19,12 @@ import Navbar from "./components/Navbar/Navbar";
 import Navigation from "./components/Navigation/Navigation";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Footer from "./components/Footer/Footer";
-import CategoryView from "./features/notifications/components/ListView/CategoryView";
-import UserNotificationDetailPage from "./features/notifications/components/ListView/UserNotificationDetailPage";
 import SignUpPopup from "./components/SignUpPopup";
 import { checkAuthStatus, logoutUser } from "./services/api";
 import VerifyAccountPopup from "./components/VerifyAccount";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import CategoryView from "./features/notifications/components/CategoryView";
+import UserNotificationDetailPage from "./features/notifications/components/UserNotificationDetailPage";
 
 const POPUP_INTERVAL = 90 * 1000;
 

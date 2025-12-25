@@ -10,7 +10,7 @@ const EditNotificationPage: React.FC = () => {
   const [form, setForm] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
   // Confirmation modal state
   const [showModal, setShowModal] = useState(false);

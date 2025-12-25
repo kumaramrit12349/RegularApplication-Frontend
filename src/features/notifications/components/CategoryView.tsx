@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ListView from "./ListView";
-import { fetchNotificationsByCategory } from "../../../../services/api";
+import { fetchNotificationsByCategory } from "../../../services/api";
 
 const PAGE_SIZE = 20;
 

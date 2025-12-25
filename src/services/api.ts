@@ -63,6 +63,7 @@ export const addNotification = async (data: NotificationFormData) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    credentials: 'include', // <-- send cookies to localhost:4000
   });
   
   if (!response.ok) {
@@ -81,10 +82,14 @@ export const fetchHomePageNotifications = async () => {
 
 // Fetch all notifications
 export const fetchNotifications = async () => {
-  const response = await fetch(`${API_BASE_URL}/notification/view`);
+  const response = await fetch(`${API_BASE_URL}/notification/view`, {
+    method: 'GET',
+    credentials: 'include', // <-- send cookies to localhost:4000
+  });
   if (!response.ok) throw new Error("Failed to fetch notifications");
   return response.json();
 };
+
 
 // Get single notification by ID
 export const getNotificationById = async (id: string) => {
@@ -99,10 +104,13 @@ export const updateNotification = async (id: string, data: any) => {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+    credentials: "include", // send cookies
   });
+
   if (!response.ok) throw new Error("Failed to update notification");
   return response.json();
 };
+
 
 // Approve notification
 export const approveNotification = async (id: string) => {
@@ -110,6 +118,7 @@ export const approveNotification = async (id: string) => {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ approved_by: 'admin', verified_by: 'admin' }),
+    credentials: "include", // send cookies
   });
   if (!response.ok) throw new Error("Failed to approve notification");
   return response.json();
@@ -119,6 +128,7 @@ export const approveNotification = async (id: string) => {
 export const deleteNotification = async (id: string) => {
   const response = await fetch(`${API_BASE_URL}/notification/delete/${id}`, {
     method: "DELETE",
+    credentials: "include", // send cookies
   });
   if (!response.ok) throw new Error("Failed to delete notification");
   return response.json();
@@ -129,6 +139,7 @@ export const deleteNotification = async (id: string) => {
 export const unarchiveNotification = async (id: string) => {
   const response = await fetch(`${API_BASE_URL}/notification/unarchive/${id}`, {
     method: "PATCH",
+    credentials: "include", // send cookies
   });
   if (!response.ok) throw new Error("Failed to unarchive notification");
   return response.json();

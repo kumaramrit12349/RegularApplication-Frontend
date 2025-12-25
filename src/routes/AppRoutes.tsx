@@ -4,8 +4,8 @@ import DashboardPage from "../pages/admin/DashboardPage";
 import AddNotificationPage from "../pages/admin/AddNotificationPage";
 import EditNotificationPage from "../pages/admin/EditNotificationPage";
 import ReviewNotificationPage from "../pages/admin/ReviewNotificationPage";
-import CategoryView from "../features/notifications/components/ListView/CategoryView";
-import UserNotificationDetailPage from "../features/notifications/components/ListView/UserNotificationDetailPage";
+import CategoryView from "../features/notifications/components/CategoryView";
+import UserNotificationDetailPage from "../features/notifications/components/UserNotificationDetailPage";
 
 function App() {
   return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ListView from "../../features/notifications/components/ListView/ListView";
+import ListView from "../../features/notifications/components/ListView";
 import { fetchNotificationsByCategory, fetchHomePageNotifications } from "../../services/api";
 import { useLocation } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
