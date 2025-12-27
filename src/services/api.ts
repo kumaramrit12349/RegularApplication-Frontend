@@ -1,51 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+import type { NotificationForm } from "../Interfaces/Notification";
 
-// Interface matching your form data
-export interface NotificationFormData {
-  // Notifications table
-  title: string;
-  category: string;
-  department: string;
-  total_vacancies: string;
-  isAdminCardAvailable: boolean;
-  isResultPublished: boolean;
-  isAnswerKeyPublished: boolean;
-  
-  // Important dates
-  application_begin_date: string;
-  last_date_for_apply: string;
-  exam_date: string;
-  admit_card_available_date: string;
-  result_date: string;
-  
-  // Fees
-  general_fee: string;
-  obc_fee: string;
-  sc_fee: string;
-  st_fee: string;
-  ph_fee: string;
-  other_fee_details: string;
-  
-  // Eligibility
-  min_age: string;
-  max_age: string;
-  age_relaxation_details: string;
-  
-  // Education
-  qualification: string;
-  specialization: string;
-  min_percentage: string;
-  additional_details: string;
-  
-  // Links
-  apply_online_url: string;
-  notification_pdf_url: string;
-  official_website_url: string;
-  admit_card_url: string;
-  result_url: string;
-  answer_key_url: string;
-  other_links: string;
-}
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
 export interface AuthStatus {
   isAuthenticated: boolean;
@@ -58,18 +14,18 @@ export interface AuthStatus {
 }
 
 // Add notification with all related data
-export const addNotification = async (data: NotificationFormData) => {
+export const addNotification = async (data: NotificationForm) => {
   const response = await fetch(`${API_BASE_URL}/notification/add`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
-    credentials: 'include', // <-- send cookies to localhost:4000
+    credentials: "include", // <-- send cookies to localhost:4000
   });
-  
+
   if (!response.ok) {
     throw new Error("Failed to add notification");
   }
-  
+
   return response.json();
 };
 
@@ -83,13 +39,12 @@ export const fetchHomePageNotifications = async () => {
 // Fetch all notifications
 export const fetchNotifications = async () => {
   const response = await fetch(`${API_BASE_URL}/notification/view`, {
-    method: 'GET',
-    credentials: 'include', // <-- send cookies to localhost:4000
+    method: "GET",
+    credentials: "include", // <-- send cookies to localhost:4000
   });
   if (!response.ok) throw new Error("Failed to fetch notifications");
   return response.json();
 };
-
 
 // Get single notification by ID
 export const getNotificationById = async (id: string) => {
@@ -111,13 +66,12 @@ export const updateNotification = async (id: string, data: any) => {
   return response.json();
 };
 
-
 // Approve notification
 export const approveNotification = async (id: string) => {
   const response = await fetch(`${API_BASE_URL}/notification/approve/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ approved_by: 'admin', verified_by: 'admin' }),
+    body: JSON.stringify({ approved_by: "admin" }),
     credentials: "include", // send cookies
   });
   if (!response.ok) throw new Error("Failed to approve notification");
@@ -133,7 +87,6 @@ export const deleteNotification = async (id: string) => {
   if (!response.ok) throw new Error("Failed to delete notification");
   return response.json();
 };
-
 
 // Unarchive notification
 export const unarchiveNotification = async (id: string) => {
@@ -171,7 +124,6 @@ export const fetchNotificationsByCategory = async (
   return await response.json();
 };
 
-
 export const signUpUser = async (
   given_name: string,
   family_name: string,
@@ -192,7 +144,6 @@ export const signUpUser = async (
   return await response.json();
 };
 
-
 export const loginUser = async (email: string, password: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/signin`, {
     method: "POST",
@@ -208,8 +159,6 @@ export const loginUser = async (email: string, password: string) => {
 
   return response.json();
 };
-
-
 
 export const logoutUser = async () => {
   await fetch(`${API_BASE_URL}/auth/logout`, {
@@ -263,4 +212,3 @@ export const checkAuthStatus = async (): Promise<AuthStatus> => {
     return { isAuthenticated: false };
   }
 };
-
