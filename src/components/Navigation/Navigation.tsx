@@ -1,34 +1,50 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { categories } from "../../features/notifications/services/notificationService";
 
 const Navigation: React.FC = () => {
   const location = useLocation();
+  // Extract the active category from the route, defaulting to "all"
+  const match = location.pathname.match(/\/notification\/category\/([^/]+)/i);
+  const activeCategory = match ? decodeURIComponent(match[1]) : "all";
 
-  const navItems = [
-    { name: "Home", path: "/" },
-    { name: "Jobs", path: "/jobs" },
-    { name: "Admit Cards", path: "/admit-cards" },
-    { name: "Results", path: "/results" },
-    { name: "Entrance Exams", path: "/entrance-exams" },
-  ];
+  // Build canonical links for each category
+  const getNavLink = (item: (typeof categories)[number]) => {
+    return item.value === "all"
+      ? "/" // Home
+      : `/notification/category/${item.value}`;
+  };
+
+  // Determine which nav item should be "active"
+  const isActive = (item: (typeof categories)[number]) => {
+    // Highlight home if on root:
+    if (item.value === "all" && location.pathname === "/") return true;
+    // Highlight category if in canonical category route:
+    if (activeCategory && item.value !== "all" && activeCategory === item.value)
+      return true;
+    return false;
+  };
 
   return (
-    <nav className="bg-light border-bottom shadow-sm sticky-top" style={{ top: '82px', zIndex: 1020 }}>
+    <nav
+      className="bg-light border-bottom shadow-sm sticky-top"
+      style={{ top: "74px", zIndex: 1020 }}
+    >
       <div className="container">
         <div className="overflow-auto">
           <ul className="nav nav-pills py-2 flex-nowrap">
-            {navItems.map((item) => (
-              <li className="nav-item" key={item.path}>
+            {categories.map((item) => (
+              <li className="nav-item" key={item.value}>
                 <Link
-                  to={item.path}
+                  to={getNavLink(item)}
                   className={`nav-link text-nowrap ${
-                    location.pathname === item.path
+                    isActive(item)
                       ? "active bg-primary text-white"
                       : "text-dark"
                   }`}
-                  style={{ borderRadius: "8px", fontWeight: "500" }}
+                  style={{ borderRadius: "8px", fontWeight: 500 }}
                 >
-                  {item.name}
+                  {item.label}
                 </Link>
               </li>
             ))}

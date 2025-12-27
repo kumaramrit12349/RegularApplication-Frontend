@@ -1,20 +1,76 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { categories } from "../../features/notifications/services/notificationService";
 
 interface SearchBarProps {
-  placeholder?: string;
   onSearch?: (query: string, filter: string) => void;
+  placeholder?: string;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-  placeholder = "Search notifications...",
   onSearch,
+  placeholder = "Search notifications...",
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const match = location.pathname.match(/\/notification\/category\/([^/]+)/i);
+  const urlCategory = match ? decodeURIComponent(match[1]) : "all";
+
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState(urlCategory);
+  // When route/category changes, always reset filter and input
+  useEffect(() => {
+    setFilter(urlCategory);
+    setQuery(""); // <- This clears search field every time category changes
+  }, [urlCategory]);
 
   const handleSearch = () => {
-    if (onSearch) {
-      onSearch(query, filter);
+    if (onSearch) onSearch(query, filter);
+    // Route should update, including search query in state
+    if (filter !== "all") {
+      navigate(
+        `/notification/category/${filter}?searchValue=${encodeURIComponent(
+          query
+        )}`
+      );
+    } else {
+      navigate(`/?searchValue=${encodeURIComponent(query)}`);
+    }
+  };
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setFilter(val);
+    setQuery(""); // <- This resets the search input immediately on dropdown change
+    // Also navigate to category WITHOUT old search param:
+    if (val !== "all") {
+      navigate(`/notification/category/${val}`);
+    } else {
+      navigate("/");
+    }
+  };
+
+  // Handle input change: if cleared, remove searchValue from URL immediately
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value === "") {
+      if (filter !== "all") {
+        navigate(`/notification/category/${filter}`);
+      } else {
+        navigate(`/`);
+      }
+    }
+  };
+
+  // Handle (X) button clear
+  const handleClearSearch = () => {
+    setQuery("");
+    if (filter !== "all") {
+      navigate(`/notification/category/${filter}`);
+    } else {
+      navigate(`/`);
     }
   };
 
@@ -28,26 +84,38 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 className="form-select"
                 style={{ maxWidth: "150px" }}
                 value={filter}
-                onChange={(e) => setFilter(e.target.value)}
+                onChange={handleFilterChange}
               >
-                <option value="all">All</option>
-                <option value="jobs">Jobs</option>
-                <option value="results">Results</option>
-                <option value="admit-cards">Admit Cards</option>
-                <option value="exams">Exams</option>
+                {categories.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
               </select>
               <input
                 type="text"
                 className="form-control"
-                placeholder={placeholder}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                placeholder={placeholder}
+                onChange={handleInputChange}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
+              {query && (
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  onClick={handleClearSearch}
+                  tabIndex={-1}
+                  style={{ zIndex: 2 }}
+                  aria-label="Clear search"
+                >
+                  &#x2715;
+                </button>
+              )}
               <button
                 className="btn btn-primary px-4"
-                type="button"
                 onClick={handleSearch}
+                type="button"
               >
                 Search
               </button>

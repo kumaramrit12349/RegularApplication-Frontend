@@ -14,7 +14,7 @@ const DashboardPage: React.FC = () => {
   const [tab, setTab] = useState<"pending" | "approved" | "archived">(
     "pending"
   );
-  const archived = notifications.filter((n) => n.isarchived);
+  const archived = notifications.filter((n) => n.is_archived);
   const [loading, setLoading] = useState(false);
 
   const loadNotifications = async () => {
@@ -128,8 +128,8 @@ const DashboardPage: React.FC = () => {
     });
   };
 
-  const pending = notifications.filter((n) => !n.approved_at && !n.isarchived);
-  const approved = notifications.filter((n) => n.approved_at && !n.isarchived);
+  const pending = notifications.filter((n) => !n.approved_at && !n.is_archived);
+  const approved = notifications.filter((n) => n.approved_at && !n.is_archived);
   let displayList: any[] = [];
   if (tab === "pending") displayList = pending;
   else if (tab === "approved") displayList = approved;
@@ -218,7 +218,7 @@ const DashboardPage: React.FC = () => {
                         View
                       </Link>
                       {/* Edit button - hidden for archived */}
-                      {!n.isarchived && (
+                      {!n.is_archived && (
                         <Link
                           to={`/admin/edit/${n.id}`}
                           className="btn btn-sm btn-secondary me-2"
@@ -227,7 +227,7 @@ const DashboardPage: React.FC = () => {
                         </Link>
                       )}
                       {/* Approve button - only for pending, hidden for archived */}
-                      {!n.approved_at && !n.isarchived && (
+                      {!n.approved_at && !n.is_archived && (
                         <button
                           className="btn btn-sm btn-success me-2"
                           onClick={() => handleApprove(n.id)}
@@ -237,7 +237,7 @@ const DashboardPage: React.FC = () => {
                       )}
 
                       {/* Archive/Restore buttons */}
-                      {!n.isarchived ? (
+                      {!n.is_archived ? (
                         <button
                           className="btn btn-sm btn-danger"
                           onClick={() => handleDelete(n.id)}
