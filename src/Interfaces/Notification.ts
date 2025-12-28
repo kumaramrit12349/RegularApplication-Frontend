@@ -1,16 +1,18 @@
+import type { NotificationCategory } from "../types/notification";
+
 // For Fronted
 export interface NotificationFormState {
   title: string;
-  category: string;
+  category: NotificationCategory;
   department: string;
   total_vacancies: string;
 
   short_description: string;
   long_description: string;
 
-  is_admit_card_published: boolean;
-  is_result_published: boolean;
-  is_answer_key_published: boolean;
+  has_admit_card: boolean;
+  has_result: boolean;
+  has_answer_key: boolean;
 
   start_date: string;
   last_date_to_apply: string;
@@ -49,16 +51,16 @@ export interface NotificationFormState {
 export interface NotificationForm {
   // Basic details
   title: string;
-  category: string;
+  category: NotificationCategory;
   department: string;
   total_vacancies: number;
 
   short_description: string;
   long_description: string;
 
-  is_admit_card_published: boolean;
-  is_result_published: boolean;
-  is_answer_key_published: boolean;
+  has_admit_card: boolean;
+  has_result: boolean;
+  has_answer_key: boolean;
 
   // Important dates
   start_date: string;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { categories } from "../../features/notifications/services/notificationService";
+import { NOTIFICATION_CATEGORIES } from "../../constant/SharedConstant";
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -9,14 +9,14 @@ const Navigation: React.FC = () => {
   const activeCategory = match ? decodeURIComponent(match[1]) : "all";
 
   // Build canonical links for each category
-  const getNavLink = (item: (typeof categories)[number]) => {
+  const getNavLink = (item: (typeof NOTIFICATION_CATEGORIES)[number]) => {
     return item.value === "all"
       ? "/" // Home
       : `/notification/category/${item.value}`;
   };
 
   // Determine which nav item should be "active"
-  const isActive = (item: (typeof categories)[number]) => {
+  const isActive = (item: (typeof NOTIFICATION_CATEGORIES)[number]) => {
     // Highlight home if on root:
     if (item.value === "all" && location.pathname === "/") return true;
     // Highlight category if in canonical category route:
@@ -33,7 +33,7 @@ const Navigation: React.FC = () => {
       <div className="container">
         <div className="overflow-auto">
           <ul className="nav nav-pills py-2 flex-nowrap">
-            {categories.map((item) => (
+            {NOTIFICATION_CATEGORIES.map((item) => (
               <li className="nav-item" key={item.value}>
                 <Link
                   to={getNavLink(item)}

@@ -5,6 +5,7 @@ import "react-quill-new/dist/quill.snow.css";
 import type { NotificationFormValues } from "../../types/notification";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../components/Toast/Toast";
+import { NOTIFICATION_CATEGORIES } from "../../constant/SharedConstant";
 
 type Props = {
   mode: "create" | "edit";
@@ -132,11 +133,11 @@ const NotificationForm: React.FC<Props> = ({
             required
           >
             <option value="">Select</option>
-            <option value="Job">Job</option>
-            <option value="Result">Result</option>
-            <option value="Exam">Exam</option>
-            <option value="Admit Card">Admit Card</option>
-            <option value="Answer Key">Answer Key</option>
+            {NOTIFICATION_CATEGORIES.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -188,8 +189,8 @@ const NotificationForm: React.FC<Props> = ({
             className="form-check-input"
             type="checkbox"
             id="admitcard"
-            name="is_admit_card_published"
-            checked={form.is_admit_card_published}
+            name="has_admit_card"
+            checked={form.has_admit_card}
             onChange={handleChange}
           />
           <label className="form-check-label" htmlFor="admitcard">
@@ -202,8 +203,8 @@ const NotificationForm: React.FC<Props> = ({
             className="form-check-input"
             type="checkbox"
             id="result"
-            name="is_result_published"
-            checked={form.is_result_published}
+            name="has_result"
+            checked={form.has_result}
             onChange={handleChange}
           />
           <label className="form-check-label" htmlFor="result">
@@ -216,8 +217,8 @@ const NotificationForm: React.FC<Props> = ({
             className="form-check-input"
             type="checkbox"
             id="answerkey"
-            name="is_answer_key_published"
-            checked={form.is_answer_key_published}
+            name="has_answer_key"
+            checked={form.has_answer_key}
             onChange={handleChange}
           />
           <label className="form-check-label" htmlFor="answerkey">

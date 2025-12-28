@@ -14,9 +14,9 @@ export const mapFormToPayload = (
   short_description: form.short_description,
   long_description: form.long_description,
 
-  is_admit_card_published: form.is_admit_card_published,
-  is_result_published: form.is_result_published,
-  is_answer_key_published: form.is_answer_key_published,
+  has_admit_card: form.has_admit_card,
+  has_result: form.has_result,
+  has_answer_key: form.has_answer_key,
 
   start_date: form.start_date,
   last_date_to_apply: form.last_date_to_apply,

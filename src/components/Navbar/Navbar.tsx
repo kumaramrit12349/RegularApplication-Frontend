@@ -2,6 +2,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import ProfileSection from "../../features/notifications/components/ProfileSection";
+import {
+  NOTIFICATION_CATEGORIES,
+  WEBSITE_NAME,
+} from "../../constant/SharedConstant";
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -35,9 +39,7 @@ const Navbar: React.FC<NavbarProps> = ({
             className="me-2"
             style={{ borderRadius: "8px" }}
           />
-          <span className="fw-semibold d-none d-sm-inline">
-            Regular Application
-          </span>
+          <span className="fw-semibold d-none d-sm-inline">{WEBSITE_NAME}</span>
         </Link>
 
         {/* Right (always visible): profile on mobile + toggler */}
@@ -66,32 +68,28 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Collapsible content: tabs + desktop profile */}
-        <div
-          className="collapse navbar-collapse"
-          id="navbarNav"
-        >
+        <div className="collapse navbar-collapse" id="navbarNav">
           {/* Center / left navigation links */}
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            {/* Home link */}
             <li className="nav-item">
               <Link className="nav-link" to="/">
                 Home
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/notification/category/job">
-                Jobs
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/notification/category/admit-card">
-                Admit Cards
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/notification/category/result">
-                Results
-              </Link>
-            </li>
+
+            {/* Dynamic category links */}
+            {NOTIFICATION_CATEGORIES.filter((cat) => cat.value !== "all") // Skip "all"
+              .map((category) => (
+                <li key={category.value} className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to={`/notification/category/${category.value}`}
+                  >
+                    {category.label}
+                  </Link>
+                </li>
+              ))}
           </ul>
 
           {/* Desktop profile (hidden on small screens, shown on lg+) */}
