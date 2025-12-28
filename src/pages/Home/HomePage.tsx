@@ -3,14 +3,11 @@ import ListView from "../../features/notifications/components/ListView";
 import { fetchNotificationsByCategory, fetchHomePageNotifications } from "../../services/api";
 import { useLocation } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
+import type { HomePageNotification } from "../../types/notification";
 
-interface ListViewNotification {
-  name: string;
-  notification_id: string;
-}
 
 interface GroupedNotifications {
-  [category: string]: ListViewNotification[];
+  [category: string]: HomePageNotification[];
 }
 
 const PAGE_SIZE = 20;
@@ -24,7 +21,7 @@ const HomePage: React.FC = () => {
   const searchValue = query.get("searchValue") ?? "";
 
   // For infinite search results
-  const [searchResults, setSearchResults] = useState<ListViewNotification[]>([]);
+  const [searchResults, setSearchResults] = useState<HomePageNotification[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);

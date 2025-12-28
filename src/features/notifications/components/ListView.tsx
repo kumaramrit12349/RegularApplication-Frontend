@@ -1,13 +1,9 @@
 import React, { useState } from "react";
-
-interface Notification {
-  name: string;
-  notification_id: string;
-}
+import type { HomePageNotification } from "../../../types/notification";
 
 interface ListViewProps {
   title: string;
-  items: Notification[];
+  items: HomePageNotification[];
   loading?: boolean;
   onItemClick?: (item: Notification) => void; // You can now ignore this if always opening links in new tab
   showSeeMore?: boolean;
@@ -63,8 +59,8 @@ const ListView: React.FC<ListViewProps> = ({
             <ul className="list-group list-group-flush px-1 px-sm-2">
               {displayedItems.map((item, index) => (
                 <a
-                  key={item.notification_id || index}
-                  href={`/notification/${item.notification_id}`}
+                  key={item.id || index}
+                  href={`/notification/${item.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="list-group-item d-flex align-items-center gap-2 py-3 border-0"
@@ -98,7 +94,7 @@ const ListView: React.FC<ListViewProps> = ({
                   />
                   <div className="flex-grow-1">
                     <span className="text-dark" style={{ wordBreak: "break-word", fontSize: "1.08rem" }}>
-                      {item.name}
+                      {item.title}
                     </span>
                   </div>
                   <svg
