@@ -141,7 +141,7 @@ const HomePage: React.FC = () => {
           ) : (
             Object.entries(grouped).map(([category, notifications]) => (
               <div key={category} className="col-12 col-md-6 col-lg-4">
-                <div className="card h-100 shadow-sm">
+                <div className="h-100 shadow-sm">
                   <ListView
                     category={category}
                     items={notifications}

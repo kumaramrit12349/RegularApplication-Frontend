@@ -15,10 +15,14 @@ const ListView: React.FC<ListViewProps> = ({
   items,
   loading = false,
   showSeeMore = true,
-  showAllItems = false
+  showAllItems = false,
 }) => {
   const [showAll, setShowAll] = useState(false);
-  const displayedItems = showAllItems ? items : (showAll ? items : items.slice(0, 5));
+  const displayedItems = showAllItems
+    ? items
+    : showAll
+    ? items
+    : items.slice(0, 5);
 
   // Use a normalized path for category (lowercase, hyphens, e.g.: "Admit Cards" -> "admit-card")
   const getCategoryRoute = (category: string) => {
@@ -26,7 +30,7 @@ const ListView: React.FC<ListViewProps> = ({
   };
 
   return (
-    <div className="border-0 mb-4 shadow-sm rounded bg-white">
+    <div>
       {/* Card Header */}
       <div
         className="card-header bg-primary text-white py-3"
@@ -35,8 +39,13 @@ const ListView: React.FC<ListViewProps> = ({
           borderTopRightRadius: "0.6rem",
         }}
       >
-        <h5 className="mb-0 fw-semibold text-capitalize ms-2" style={{ fontSize: "1.1rem" }}>
-          {category?.replace(/[-]/g, ' ')?.replace(/\b\w/g, l => l?.toUpperCase())}
+        <h5
+          className="mb-0 fw-semibold text-capitalize ms-2"
+          style={{ fontSize: "1.1rem" }}
+        >
+          {category
+            ?.replace(/[-]/g, " ")
+            ?.replace(/\b\w/g, (l) => l?.toUpperCase())}
         </h5>
       </div>
       <div className="card-body p-0">
@@ -68,28 +77,23 @@ const ListView: React.FC<ListViewProps> = ({
                     boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
                     fontSize: "1.06rem",
                     color: "inherit",
-                    textDecoration: "none"
+                    textDecoration: "none",
                   }}
-                  onMouseEnter={e => {
+                  onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = "#f5f9fd";
                     e.currentTarget.style.boxShadow = "0 2px 8px #d9e8fa";
                   }}
-                  onMouseLeave={e => {
+                  onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = "";
-                    e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)";
+                    e.currentTarget.style.boxShadow =
+                      "0 1px 4px rgba(0,0,0,0.04)";
                   }}
                 >
-                  <span
-                    className="rounded-circle bg-primary d-inline-block"
-                    style={{
-                      width: "10px",
-                      height: "10px",
-                      flexShrink: 0,
-                      marginRight: "10px",
-                    }}
-                  />
                   <div className="flex-grow-1">
-                    <span className="text-dark" style={{ wordBreak: "break-word", fontSize: "1.08rem" }}>
+                    <span
+                      className="text-dark"
+                      style={{ wordBreak: "break-word", fontSize: "1.08rem" }}
+                    >
                       {item.title}
                     </span>
                   </div>
@@ -116,8 +120,18 @@ const ListView: React.FC<ListViewProps> = ({
                     className="btn btn-outline-primary w-100"
                     onClick={() => setShowAll(false)}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="me-2" viewBox="0 0 16 16">
-                      <path fillRule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="me-2"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"
+                      />
                     </svg>
                     See Less
                   </button>
@@ -128,8 +142,18 @@ const ListView: React.FC<ListViewProps> = ({
                       window.open(getCategoryRoute(category), "_blank");
                     }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="me-2" viewBox="0 0 16 16">
-                      <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="me-2"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"
+                      />
                     </svg>
                     See More
                   </button>

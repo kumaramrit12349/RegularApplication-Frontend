@@ -5,7 +5,7 @@ import ListView from "./ListView";
 import { fetchNotificationsByCategory } from "../../../services/api";
 import type { HomePageNotification } from "../../../types/notification";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -92,7 +92,7 @@ const CategoryView: React.FC = () => {
               }
             >
               <ListView
-                title={decodedCategory}
+                category={decodedCategory}
                 items={items}
                 showSeeMore={false}
                 showAllItems={true}
