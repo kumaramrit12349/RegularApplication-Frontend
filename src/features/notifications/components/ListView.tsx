@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import type { HomePageNotification } from "../../../types/notification";
 
 interface ListViewProps {
-  title: string;
+  category: string;
   items: HomePageNotification[];
   loading?: boolean;
   onItemClick?: (item: Notification) => void; // You can now ignore this if always opening links in new tab
@@ -11,7 +11,7 @@ interface ListViewProps {
 }
 
 const ListView: React.FC<ListViewProps> = ({
-  title,
+  category,
   items,
   loading = false,
   showSeeMore = true,
@@ -22,11 +22,7 @@ const ListView: React.FC<ListViewProps> = ({
 
   // Use a normalized path for category (lowercase, hyphens, e.g.: "Admit Cards" -> "admit-card")
   const getCategoryRoute = (category: string) => {
-    const value = category
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-");
-    return `/notification/category/${encodeURIComponent(value)}`;
+    return `/notification/category/${encodeURIComponent(category)}`;
   };
 
   return (
@@ -40,7 +36,7 @@ const ListView: React.FC<ListViewProps> = ({
         }}
       >
         <h5 className="mb-0 fw-semibold text-capitalize ms-2" style={{ fontSize: "1.1rem" }}>
-          {title}
+          {category?.replace(/[-]/g, ' ')?.replace(/\b\w/g, l => l?.toUpperCase())}
         </h5>
       </div>
       <div className="card-body p-0">
@@ -129,7 +125,7 @@ const ListView: React.FC<ListViewProps> = ({
                   <button
                     className="btn btn-outline-primary w-100"
                     onClick={() => {
-                      window.open(getCategoryRoute(title), "_blank");
+                      window.open(getCategoryRoute(category), "_blank");
                     }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="me-2" viewBox="0 0 16 16">

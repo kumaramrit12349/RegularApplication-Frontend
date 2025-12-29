@@ -58,7 +58,7 @@ const CategoryView: React.FC = () => {
             className="mb-3 text-center text-capitalize"
             style={{ fontSize: "1.6rem" }}
           >
-            Notifications: {decodedCategory.replace(/-/g, " ")}
+            {decodedCategory.replace(/-/g, " ")}
             {searchValue && (
               <span className="text-muted ms-2" style={{ fontSize: "1rem" }}>
                 (Search: "{searchValue}")

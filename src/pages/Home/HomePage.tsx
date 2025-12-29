@@ -114,7 +114,7 @@ const HomePage: React.FC = () => {
                 }
               >
                 <ListView
-                  title="Search Results"
+                  category="Search Results"
                   items={searchResults}
                   showSeeMore={false}
                   showAllItems={true}
@@ -143,7 +143,7 @@ const HomePage: React.FC = () => {
               <div key={category} className="col-12 col-md-6 col-lg-4">
                 <div className="card h-100 shadow-sm">
                   <ListView
-                    title={category}
+                    category={category}
                     items={notifications}
                     loading={groupedLoading}
                   />
