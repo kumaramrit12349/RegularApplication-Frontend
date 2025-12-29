@@ -73,19 +73,25 @@ const Card = ({
 const LabelValue = ({
   label,
   value,
-  bold,
-  red,
+  highlight,
 }: {
   label: string;
   value?: any;
-  bold?: boolean;
-  red?: boolean;
+  highlight?: boolean; // use for important rows like last date
 }) => (
-  <div className="d-flex mb-2 flex-wrap">
-    <span className={`me-2 ${bold ? "fw-bold" : ""} ${red ? "text-danger" : ""}`}>
+  <div className="d-flex mb-2 flex-wrap align-items-start">
+    <span
+      className={`me-2 fw-semibold ${
+        highlight ? "text-danger" : "text-dark"
+      }`}
+      style={{ fontSize: "0.95rem" }} // standard label size
+    >
       {label}
     </span>
-    <span className={`${red ? "text-danger fw-bold" : ""}`}>
+    <span
+      className={`${highlight ? "text-danger fw-semibold" : "text-secondary"}`}
+      style={{ fontSize: "0.95rem" }} // same size for consistency
+    >
       {value ?? "—"}
     </span>
   </div>
@@ -169,8 +175,6 @@ export default function NotificationDetailView({
                 <LabelValue
                   label="Category:"
                   value={formatCategoryTitle(notification.category)}
-                  bold
-                  red
                 />
                 <LabelValue label="Department:" value={notification.department} />
                 <LabelValue
@@ -186,8 +190,6 @@ export default function NotificationDetailView({
                 <LabelValue
                   label="Last Date To Apply:"
                   value={formatDate(notification.last_date_to_apply)}
-                  bold
-                  red
                 />
                 <LabelValue label="Exam Date:" value={formatDate(notification.exam_date)} />
                 <LabelValue label="Admit Card:" value={formatDate(notification.admit_card_available_date)} />
