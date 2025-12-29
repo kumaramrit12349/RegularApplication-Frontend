@@ -387,24 +387,30 @@ export default function NotificationDetailView({
 
           {/* ---------------- Admin Metadata ---------------- */}
           {isAdmin && (
-            <Card title="Admin Metadata" icon={<BsGear />}>
-              <LabelValue
-                label="Created At:"
-                value={formatDateTime(notification.created_at)}
-              />
-              <LabelValue
-                label="Updated At:"
-                value={formatDateTime(notification.updated_at)}
-              />
-              <LabelValue
-                label="Approved By:"
-                value={notification.approved_by}
-              />
-              <LabelValue
-                label="Approved At:"
-                value={formatDateTime(notification.approved_at)}
-              />
-            </Card>
+            <div className="mb-5">
+              <Card title="Admin Metadata" icon={<BsGear />}>
+                <LabelValue
+                  label="Created At:"
+                  value={formatDateTime(notification.created_at)}
+                />
+                <LabelValue
+                  label="Updated At:"
+                  value={formatDateTime(notification.updated_at)}
+                />
+                <LabelValue
+                  label="Approved By:"
+                  value={notification.approved_by || "Not approved yet"}
+                />
+                <LabelValue
+                  label="Approved At:"
+                  value={
+                    notification.approved_at
+                      ? formatDateTime(notification.approved_at)
+                      : "Pending approval"
+                  }
+                />
+              </Card>
+            </div>
           )}
         </div>
       </div>
