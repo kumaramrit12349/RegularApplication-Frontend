@@ -1,13 +1,16 @@
 import React from "react";
 import {
   BsCalendar,
-  BsFillClipboardCheckFill,
   BsFillPersonFill,
   BsCurrencyRupee,
   BsLink45Deg,
   BsArrowUpRightCircle,
   BsGear,
+  BsDownload,
+  BsFileEarmarkText,
 } from "react-icons/bs";
+import { formatCategoryTitle } from "../../services/utils";
+import { FcViewDetails } from "react-icons/fc";
 
 const formatDate = (d?: string) =>
   d
@@ -46,6 +49,36 @@ const Card = ({
     <div className="card-body py-3">{children}</div>
   </div>
 );
+
+// Add this helper function at top of component
+const formatCurrency = (amount?: string | number) =>
+  amount ? `₹${parseFloat(String(amount)).toLocaleString()}` : "—";
+
+const getGroupedFees = (notification: any) => {
+  const feesMap: Record<string, string[]> = {};
+
+  const fees = [
+    { key: "general_fee", label: "Gen" },
+    { key: "obc_fee", label: "OBC" },
+    { key: "sc_fee", label: "SC" },
+    { key: "st_fee", label: "ST" },
+    { key: "ph_fee", label: "PH" },
+  ];
+
+  fees.forEach(({ key, label }) => {
+    const value = notification[key];
+    const formattedValue = formatCurrency(value);
+
+    if (formattedValue !== "—") {
+      if (!feesMap[formattedValue]) {
+        feesMap[formattedValue] = [];
+      }
+      feesMap[formattedValue].push(label);
+    }
+  });
+
+  return Object.entries(feesMap);
+};
 
 const LabelValue = ({
   label,
@@ -124,7 +157,7 @@ export default function NotificationDetailView({
   approving?: boolean;
 }) {
   return (
-    <main className="container py-5" style={{ maxWidth: 1000 }}>
+    <main className="container" style={{ maxWidth: 1000 }}>
       {/* Admin Action Bar - Right aligned */}
       {isAdmin && (
         <div
@@ -155,30 +188,57 @@ export default function NotificationDetailView({
         </div>
       )}
       {/* Title & meta chips */}
-      <div className="mb-4 text-center">
+      <div className="mb-5 text-center w-100 overflow-hidden">
         <h1
-          className="fw-bold mb-2"
-          style={{ fontSize: "2rem", lineHeight: 1.25 }}
+          className="fw-bold mb-3 mx-auto px-2"
+          style={{
+            maxWidth: "900px",
+            fontSize: "clamp(1.4rem, 5vw, 2.2rem)",
+            lineHeight: 1.3,
+          }}
         >
           {notification.title}
         </h1>
-        <div className="d-flex justify-content-center flex-wrap mb-2">
-          <Chip color="info">{notification.category}</Chip>
-          {notification.total_vacancies && (
-            <Chip color="secondary">
-              Vacancies: {notification.total_vacancies}
-            </Chip>
-          )}
-          {notification.department && (
-            <Chip color="primary">
-              <BsFillClipboardCheckFill className="me-1" />
-              {notification.department}
-            </Chip>
-          )}
-        </div>
+
+        {notification.short_description && (
+          <div className="d-flex justify-content-center px-2">
+            <div
+              className="short-description-wrapper mt-3 px-3 py-3 rounded-3 bg-light border w-100"
+              style={{ maxWidth: "900px" }}
+            >
+              <div
+                className="short-description-content text-muted lh-lg text-start"
+                dangerouslySetInnerHTML={{
+                  __html: notification.short_description,
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
+
       {/* Card Grid */}
       <div className="row row-cols-1 row-cols-md-2 g-4">
+        {/* Basic Details */}
+        <div className="col">
+          <Card
+            title="Basic Details"
+            icon={<FcViewDetails className="text-warning" />}
+          >
+            <LabelValue label="Title:" value={notification.title} />
+            <LabelValue
+              label="Category:"
+              value={formatCategoryTitle(notification.category)}
+              bold
+              red
+            />
+            <LabelValue label="Department:" value={notification.department} />
+            <LabelValue
+              label="Total Vacancy:"
+              value={notification.total_vacancies}
+            />
+          </Card>
+        </div>
         {/* Important Dates */}
         <div className="col">
           <Card
@@ -187,11 +247,11 @@ export default function NotificationDetailView({
           >
             <LabelValue
               label="Start Date:"
-              value={formatDate(notification.application_begin_date)}
+              value={formatDate(notification.start_date)}
             />
             <LabelValue
               label="Last Date To Apply:"
-              value={formatDate(notification.last_date_for_apply)}
+              value={formatDate(notification.last_date_to_apply)}
               bold
               red
             />
@@ -215,18 +275,23 @@ export default function NotificationDetailView({
             title="Fees"
             icon={<BsCurrencyRupee className="text-success" />}
           >
-            <div>
-              <Chip color="primary">
-                Gen: ₹{notification.general_fee || "-"}
-              </Chip>
-              <Chip color="secondary">OBC: ₹{notification.obc_fee || "-"}</Chip>
-              <Chip color="success">SC: ₹{notification.sc_fee || "-"}</Chip>
-              <Chip color="danger">ST: ₹{notification.st_fee || "-"}</Chip>
-              <Chip color="dark">PH: ₹{notification.ph_fee || "-"}</Chip>
-            </div>
-            <div className="text-muted mt-2" style={{ minHeight: 20 }}>
-              {notification.other_fee_details}
-            </div>
+            {getGroupedFees(notification).map(([feeValue, categories]) => (
+              <LabelValue
+                key={feeValue}
+                label={`${categories.join("/")} Fee:`}
+                value={feeValue}
+              />
+            ))}
+            {notification.other_fee_details && (
+              <div className="mt-3 pt-2 border-top">
+                <div
+                  className="text-muted small lh-sm"
+                  dangerouslySetInnerHTML={{
+                    __html: notification.other_fee_details,
+                  }}
+                />
+              </div>
+            )}
           </Card>
         </div>
         {/* Eligibility */}
@@ -241,10 +306,10 @@ export default function NotificationDetailView({
                 notification.max_age ?? "—"
               } yrs`}
             />
-            <LabelValue
+            {/* <LabelValue
               label="Age Relaxation:"
               value={notification.age_relaxation_details}
-            />
+            /> */}
             <LabelValue
               label="Qualification:"
               value={notification.qualification}
@@ -253,55 +318,176 @@ export default function NotificationDetailView({
               label="Specialization:"
               value={notification.specialization}
             />
-            <LabelValue label="Min %age:" value={notification.min_percentage} />
+            <LabelValue
+              label="Min Percentage:"
+              value={notification.min_percentage}
+            />
+            {notification.age_relaxation_details && (
+              <div className="mt-3 pt-2 border-top">
+                <div
+                  className="text-muted small lh-sm"
+                  dangerouslySetInnerHTML={{
+                    __html: notification.age_relaxation_details,
+                  }}
+                />
+              </div>
+            )}
           </Card>
         </div>
         {/* Links */}
-        <div className="col">
-          <Card
-            title="Important Links"
-            icon={<BsLink45Deg className="text-info" />}
-          >
-            <div className="mb-2 d-flex flex-wrap">
-              <LinkButton
-                label="Apply Online"
-                href={notification.apply_online_url}
-                color="primary"
-              />
-              <LinkButton
-                label="Download Notification"
-                href={notification.notification_pdf_url}
-                color="danger"
-              />
-              <LinkButton
-                label="Official Website"
-                href={notification.official_website_url}
-                color="info"
-              />
-              <LinkButton
-                label="Download Admit Card"
-                href={notification.admit_card_url}
-                color="success"
-              />
-              <LinkButton
-                label="Check Result"
-                href={notification.result_url}
-                color="warning"
-              />
-              <LinkButton
-                label="Answer Key"
-                href={notification.answer_key_url}
-                color="secondary"
-              />
-              <LinkButton
-                label="Other"
-                href={notification.other_links}
-                color="dark"
-              />
+        <div className="w-100">
+          <div className="card border-0 rounded-4">
+            <div className="card-body p-4">
+              <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
+                <BsLink45Deg className="text-info" />
+                Important Links
+              </h5>
+
+              {/* Primary Action */}
+              {notification.apply_online_url && (
+                <a
+                  href={notification.apply_online_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary w-100 mb-3 d-flex align-items-center justify-content-center gap-2"
+                  style={{ minHeight: "52px" }}
+                >
+                  <BsArrowUpRightCircle />
+                  Apply Online
+                </a>
+              )}
+
+              {/* Secondary Actions */}
+              <div className="row g-2">
+                {notification.admit_card_url && (
+                  <div className="col-6">
+                    <a
+                      href={notification.admit_card_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2"
+                      style={{ minHeight: "46px" }}
+                    >
+                      <BsDownload />
+                      Admit Card
+                    </a>
+                  </div>
+                )}
+
+                {notification.notification_pdf_url && (
+                  <div className="col-6">
+                    <a
+                      href={notification.notification_pdf_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2"
+                      style={{ minHeight: "46px" }}
+                    >
+                      <BsFileEarmarkText />
+                      Notification
+                    </a>
+                  </div>
+                )}
+
+                {notification.official_website_url && (
+                  <div className="col-6">
+                    <a
+                      href={notification.official_website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2"
+                      style={{ minHeight: "46px" }}
+                    >
+                      <BsArrowUpRightCircle />
+                      Official Website
+                    </a>
+                  </div>
+                )}
+
+                {notification.result_url ? (
+                  <div className="col-6">
+                    <a
+                      href={notification.result_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-warning w-100 d-flex align-items-center justify-content-center gap-2"
+                      style={{ minHeight: "46px" }}
+                    >
+                      Check Result
+                    </a>
+                  </div>
+                ) : (
+                  <div className="col-6">
+                    <button
+                      className="btn btn-secondary w-100 opacity-50"
+                      disabled
+                      style={{ minHeight: "46px" }}
+                    >
+                      Result (Soon)
+                    </button>
+                  </div>
+                )}
+
+                {notification.answer_key_url ? (
+                  <div className="col-6">
+                    <a
+                      href={notification.answer_key_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2"
+                      style={{ minHeight: "46px" }}
+                    >
+                      Answer Key
+                    </a>
+                  </div>
+                ) : (
+                  <div className="col-6">
+                    <button
+                      className="btn btn-outline-secondary w-100 opacity-50"
+                      disabled
+                      style={{ minHeight: "46px" }}
+                    >
+                      Answer Key
+                    </button>
+                  </div>
+                )}
+
+                {notification.other_links && (
+                  <div className="col-6">
+                    <a
+                      href={notification.other_links}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2"
+                      style={{ minHeight: "46px" }}
+                    >
+                      Other
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
-          </Card>
+          </div>
         </div>
       </div>
+      <div className="mb-5 text-center w-100 overflow-hidden">
+        {notification.long_description && (
+          <div className="d-flex justify-content-center px-2">
+            <div
+              className="long-description-wrapper mt-3 px-3 py-3 rounded-3 bg-light border w-100"
+              style={{ maxWidth: "900px" }}
+            >
+              <div
+                className="long-description-content text-muted lh-lg text-start"
+                dangerouslySetInnerHTML={{
+                  __html: notification.long_description,
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Admin Section */}
       {isAdmin && (
         <div className="row row-cols-1 g-4 mt-2">
