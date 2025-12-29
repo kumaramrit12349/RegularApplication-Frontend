@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-// import { Link } from "react-router-dom";
 
 interface ProfileSectionProps {
   isAuthenticated: boolean;
@@ -19,73 +18,65 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   onShowAuthPopup,
 }) => {
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLLIElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
+  /* ---------- Close on outside click ---------- */
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
       ) {
         setOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const firstInitial = givenName?.trim()?.[0]?.toUpperCase() || "";
   const lastInitial = familyName?.trim()?.[0]?.toUpperCase() || "";
-  const initials = (firstInitial + lastInitial) || "👤";
+  const initials = firstInitial + lastInitial || "U";
 
   const fullName =
     [givenName, familyName].filter(Boolean).join(" ") || "Guest User";
-  const displayEmail = email || "";
 
   if (!isAuthenticated) {
     return (
-      <>
-        <li className="nav-item me-2">
-          <button
-            className="btn btn-outline-light btn-sm"
-            onClick={onShowAuthPopup}
-          >
-            Log in
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={onShowAuthPopup}
-          >
-            Sign up
-          </button>
-        </li>
-      </>
+      <div className="d-flex gap-2">
+        <button
+          className="btn btn-outline-light btn-sm"
+          onClick={onShowAuthPopup}
+        >
+          Log in
+        </button>
+        <button className="btn btn-primary btn-sm" onClick={onShowAuthPopup}>
+          Sign up
+        </button>
+      </div>
     );
   }
 
   return (
-    <li className="nav-item dropdown position-relative" ref={dropdownRef}>
-      {/* Toggle button (works for desktop + mobile) */}
+    <div className="position-relative" ref={wrapperRef}>
+      {/* ---------- Toggle Button ---------- */}
       <button
         type="button"
-        className="btn btn-link nav-link d-flex align-items-center text-white text-decoration-none p-0"
-        onClick={() => setOpen(!open)}
-        style={{ cursor: "pointer", border: "none", background: "none" }}
+        onClick={() => setOpen((prev) => !prev)}
+        className="btn btn-link d-flex align-items-center text-white text-decoration-none p-0"
+        style={{ border: "none", background: "none" }}
       >
-        {/* Small circular avatar */}
+        {/* Avatar */}
         <div
+          className="d-flex align-items-center justify-content-center"
           style={{
             width: 36,
             height: 36,
             borderRadius: "50%",
             backgroundColor: "#0d6efd",
             color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: 600,
             flexShrink: 0,
           }}
@@ -93,9 +84,10 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           {initials}
         </div>
 
-        {/* Hide name on very small screens */}
+        {/* Name hidden on small screens */}
         <span className="d-none d-md-inline ms-2 me-1">{fullName}</span>
 
+        {/* Caret */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="12"
@@ -107,57 +99,57 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         </svg>
       </button>
 
+      {/* ---------- Dropdown ---------- */}
       {open && (
         <div
-          className="dropdown-menu dropdown-menu-end show profile-dropdown"
+          className="bg-white shadow rounded-3"
+          style={{
+            position: "absolute",
+            top: "calc(100% + 10px)",
+            right: 0,
+            minWidth: 260,
+            zIndex: 1060,
+          }}
         >
+          {/* Header */}
           <div className="px-3 py-3 border-bottom">
             <div className="d-flex align-items-center">
-              {/* Large circular avatar in panel */}
               <div
+                className="me-3 d-flex align-items-center justify-content-center"
                 style={{
-                  width: 56,
-                  height: 56,
+                  width: 52,
+                  height: 52,
                   borderRadius: "50%",
                   backgroundColor: "#0d6efd",
                   color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 22,
+                  fontSize: 20,
                   fontWeight: 600,
-                  flexShrink: 0,
                 }}
-                className="me-3"
               >
                 {initials}
               </div>
+
               <div>
                 <div className="fw-semibold">{fullName}</div>
-                {displayEmail && (
-                  <div className="text-muted small">{displayEmail}</div>
-                )}
+                {email && <div className="text-muted small">{email}</div>}
               </div>
             </div>
           </div>
 
-          <ul className="list-unstyled mb-0">
-            {/* Add items here later if needed */}
-            <li>
-              <button
-                className="dropdown-item py-2 text-danger"
-                onClick={() => {
-                  setOpen(false);
-                  onLogout();
-                }}
-              >
-                Logout
-              </button>
-            </li>
-          </ul>
+          {/* Actions */}
+          <button
+            className="btn btn-link text-danger w-100 text-start px-3 py-2"
+            style={{ textDecoration: "none" }}
+            onClick={() => {
+              setOpen(false);
+              onLogout();
+            }}
+          >
+            Logout
+          </button>
         </div>
       )}
-    </li>
+    </div>
   );
 };
 
