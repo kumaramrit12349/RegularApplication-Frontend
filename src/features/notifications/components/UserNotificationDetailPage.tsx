@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getNotificationById } from "../../../services/api";
+import { getNotificationBySlug } from "../../../services/api";
 import NotificationDetailView from "../../../components/Generic/NotificationDetailView";
 
 const UserNotificationDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
+  console.log('title', slug);
+  // const id = "9e0944c6-e351-4ff8-9eac-2c26c217fd85";
   const [notification, setNotification] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      getNotificationById(id)
+    if (slug) {
+      getNotificationBySlug(slug)
         .then((data) => {
           setNotification(data.notification);
           setLoading(false);
@@ -20,7 +22,7 @@ const UserNotificationDetailPage: React.FC = () => {
           setLoading(false);
         });
     }
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return <div className="container mt-5 text-center">

@@ -2,7 +2,7 @@ import type { NOTIFICATION_CATEGORIES } from "../constant/SharedConstant";
 
 export interface HomePageNotification {
   title: string;
-  id: string;
+  slug: string;
 }
 
 // types/notification.ts

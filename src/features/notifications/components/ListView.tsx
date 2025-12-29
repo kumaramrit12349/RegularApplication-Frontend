@@ -64,8 +64,8 @@ const ListView: React.FC<ListViewProps> = ({
             <ul className="list-group list-group-flush px-1 px-sm-2">
               {displayedItems.map((item, index) => (
                 <a
-                  key={item.id || index}
-                  href={`/notification/${item.id}`}
+                  key={item.slug || index}
+                  href={`/notification/${item.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="list-group-item d-flex align-items-center gap-2 py-3 border-0"
