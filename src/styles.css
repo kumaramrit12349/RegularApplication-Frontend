@@ -21,3 +21,21 @@
   word-break: break-all;
   overflow-wrap: anywhere;
 }
+
+/* Navbar height variable for stacked sticky headers */
+.navbar {
+  --bs-navbar-height: 56px;
+  background-color: #212529;
+}
+
+/* Desktop navbar height */
+@media (min-width: 768px) {
+  .navbar {
+    --bs-navbar-height: 64px;
+  }
+}
+
+/* Prevent shadow stacking during scroll */
+nav.sticky-top {
+  box-shadow: none;
+}
