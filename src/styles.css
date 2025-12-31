@@ -1,0 +1,41 @@
+/* === Mobile-safe text wrapping === */
+.short-description-content,
+.long-description-content {
+  max-width: 100%;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Kill inline highlight blocks */
+.short-description-content span,
+.long-description-content span {
+  background: transparent !important;
+  white-space: normal !important;
+  display: inline;
+}
+
+/* Long URLs */
+.short-description-content a,
+.long-description-content a {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+/* Navbar height variable for stacked sticky headers */
+.navbar {
+  --bs-navbar-height: 56px;
+  background-color: #212529;
+}
+
+/* Desktop navbar height */
+@media (min-width: 768px) {
+  .navbar {
+    --bs-navbar-height: 64px;
+  }
+}
+
+/* Prevent shadow stacking during scroll */
+nav.sticky-top {
+  box-shadow: none;
+}

@@ -46,9 +46,19 @@ export const fetchNotifications = async () => {
   return response.json();
 };
 
+// Get single notification by slug
+export const getNotificationBySlug = async (slug: string) => {
+  const response = await fetch(`${API_BASE_URL}/notification/getBySlug/${slug}`);
+  if (!response.ok) throw new Error("Failed to fetch notification");
+  return response.json();
+};
+
 // Get single notification by ID
 export const getNotificationById = async (id: string) => {
-  const response = await fetch(`${API_BASE_URL}/notification/getById/${id}`);
+  const response = await fetch(`${API_BASE_URL}/notification/getById/${id}`, {
+    method: "GET",
+    credentials: "include", // <-- send cookies to localhost:4000
+  });
   if (!response.ok) throw new Error("Failed to fetch notification");
   return response.json();
 };

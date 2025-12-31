@@ -1,25 +1,17 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { categories } from "../../features/notifications/services/notificationService";
+import { NOTIFICATION_CATEGORIES } from "../../constant/SharedConstant";
 
 const Navigation: React.FC = () => {
   const location = useLocation();
-  // Extract the active category from the route, defaulting to "all"
   const match = location.pathname.match(/\/notification\/category\/([^/]+)/i);
   const activeCategory = match ? decodeURIComponent(match[1]) : "all";
 
-  // Build canonical links for each category
-  const getNavLink = (item: (typeof categories)[number]) => {
-    return item.value === "all"
-      ? "/" // Home
-      : `/notification/category/${item.value}`;
-  };
+  const getNavLink = (item: (typeof NOTIFICATION_CATEGORIES)[number]) =>
+    item.value === "all" ? "/" : `/notification/category/${item.value}`;
 
-  // Determine which nav item should be "active"
-  const isActive = (item: (typeof categories)[number]) => {
-    // Highlight home if on root:
+  const isActive = (item: (typeof NOTIFICATION_CATEGORIES)[number]) => {
     if (item.value === "all" && location.pathname === "/") return true;
-    // Highlight category if in canonical category route:
     if (activeCategory && item.value !== "all" && activeCategory === item.value)
       return true;
     return false;
@@ -27,13 +19,18 @@ const Navigation: React.FC = () => {
 
   return (
     <nav
-      className="bg-light border-bottom shadow-sm sticky-top"
-      style={{ top: "74px", zIndex: 1020 }}
+      className="bg-light"
+      style={{
+        position: "sticky",
+        top: "56px",
+        zIndex: 1040,
+        borderBottom: "1px solid #dee2e6",
+      }}
     >
       <div className="container">
         <div className="overflow-auto">
-          <ul className="nav nav-pills py-2 flex-nowrap">
-            {categories.map((item) => (
+          <ul className="nav nav-pills py-2 flex-nowrap m-0">
+            {NOTIFICATION_CATEGORIES.map((item) => (
               <li className="nav-item" key={item.value}>
                 <Link
                   to={getNavLink(item)}

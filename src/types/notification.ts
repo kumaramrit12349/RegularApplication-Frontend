@@ -1,3 +1,10 @@
+import type { NOTIFICATION_CATEGORIES } from "../constant/SharedConstant";
+
+export interface HomePageNotification {
+  title: string;
+  slug: string;
+}
+
 // types/notification.ts
 export interface BaseInterface {
   id: string;
@@ -14,9 +21,9 @@ export interface NotificationForm extends BaseInterface {
   short_description: string;
   long_description: string;
 
-  is_admit_card_published: boolean;
-  is_result_published: boolean;
-  is_answer_key_published: boolean;
+  has_admit_card: boolean;
+  has_result: boolean;
+  has_answer_key: boolean;
 
   start_date: string;
   last_date_to_apply: string;
@@ -57,6 +64,8 @@ export type NotificationFormValues = Omit<
   keyof BaseInterface
 >;
 
+export type NotificationCategory = typeof NOTIFICATION_CATEGORIES[number]["value"];
+
 export const emptyNotificationForm: NotificationFormValues = {
   title: "",
   category: "",
@@ -66,9 +75,9 @@ export const emptyNotificationForm: NotificationFormValues = {
   short_description: "",
   long_description: "",
 
-  is_admit_card_published: false,
-  is_result_published: false,
-  is_answer_key_published: false,
+  has_admit_card: false,
+  has_result: false,
+  has_answer_key: false,
 
   start_date: "",
   last_date_to_apply: "",

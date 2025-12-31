@@ -3,14 +3,11 @@ import ListView from "../../features/notifications/components/ListView";
 import { fetchNotificationsByCategory, fetchHomePageNotifications } from "../../services/api";
 import { useLocation } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
+import type { HomePageNotification } from "../../types/notification";
 
-interface ListViewNotification {
-  name: string;
-  notification_id: string;
-}
 
 interface GroupedNotifications {
-  [category: string]: ListViewNotification[];
+  [category: string]: HomePageNotification[];
 }
 
 const PAGE_SIZE = 20;
@@ -24,7 +21,7 @@ const HomePage: React.FC = () => {
   const searchValue = query.get("searchValue") ?? "";
 
   // For infinite search results
-  const [searchResults, setSearchResults] = useState<ListViewNotification[]>([]);
+  const [searchResults, setSearchResults] = useState<HomePageNotification[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -117,7 +114,7 @@ const HomePage: React.FC = () => {
                 }
               >
                 <ListView
-                  title="Search Results"
+                  category="Search Results"
                   items={searchResults}
                   showSeeMore={false}
                   showAllItems={true}
@@ -144,9 +141,9 @@ const HomePage: React.FC = () => {
           ) : (
             Object.entries(grouped).map(([category, notifications]) => (
               <div key={category} className="col-12 col-md-6 col-lg-4">
-                <div className="card h-100 shadow-sm">
+                <div className="h-100 shadow-sm">
                   <ListView
-                    title={category}
+                    category={category}
                     items={notifications}
                     loading={groupedLoading}
                   />

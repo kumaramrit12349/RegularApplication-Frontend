@@ -3,13 +3,9 @@ import { useParams, useLocation } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ListView from "./ListView";
 import { fetchNotificationsByCategory } from "../../../services/api";
+import type { HomePageNotification } from "../../../types/notification";
 
-const PAGE_SIZE = 20;
-
-interface Notification {
-  name: string;
-  notification_id: string;
-}
+const PAGE_SIZE = 15;
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -21,7 +17,7 @@ const CategoryView: React.FC = () => {
   const query = useQuery();
   const searchValue = query.get("searchValue") ?? "";
 
-  const [items, setItems] = useState<Notification[]>([]);
+  const [items, setItems] = useState<HomePageNotification[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -62,7 +58,7 @@ const CategoryView: React.FC = () => {
             className="mb-3 text-center text-capitalize"
             style={{ fontSize: "1.6rem" }}
           >
-            Notifications: {decodedCategory.replace(/-/g, " ")}
+            {decodedCategory.replace(/-/g, " ")}
             {searchValue && (
               <span className="text-muted ms-2" style={{ fontSize: "1rem" }}>
                 (Search: "{searchValue}")
@@ -96,7 +92,7 @@ const CategoryView: React.FC = () => {
               }
             >
               <ListView
-                title={decodedCategory}
+                category={decodedCategory}
                 items={items}
                 showSeeMore={false}
                 showAllItems={true}

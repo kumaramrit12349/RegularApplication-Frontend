@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { categories } from "../../features/notifications/services/notificationService";
+import { NOTIFICATION_CATEGORIES } from "../../constant/SharedConstant";
 
 interface SearchBarProps {
   onSearch?: (query: string, filter: string) => void;
@@ -82,11 +82,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <div className="input-group shadow-sm">
               <select
                 className="form-select"
-                style={{ maxWidth: "150px" }}
+                style={{ maxWidth: "180px" }}
                 value={filter}
                 onChange={handleFilterChange}
               >
-                {categories.map((c) => (
+                {NOTIFICATION_CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>
                     {c.label}
                   </option>
