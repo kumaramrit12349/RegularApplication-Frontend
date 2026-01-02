@@ -77,8 +77,6 @@ export const NOTIFICATION_COLUMNS = {
   RESULT_URL: "result_url",
   OTHER_LINKS: "other_links",
 
-  SLUG: "slug", // not required for ui
-
   APPROVED_BY: "approved_by",
   APPROVED_AT: "approved_at",
   IS_ARCHIVED: "is_archived",

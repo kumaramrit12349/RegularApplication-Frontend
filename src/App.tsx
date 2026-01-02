@@ -201,7 +201,7 @@ const AppLayout: React.FC = () => {
             element={<CategoryView />}
           />
           <Route
-            path="/notification/:slug"
+            path="/notification/:slug/:id"
             element={<UserNotificationDetailPage />}
           />
 

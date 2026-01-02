@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { HomePageNotification } from "../../../types/notification";
+import { makeSlug } from "../../../services/utils";
 
 interface ListViewProps {
   category: string;
@@ -64,8 +65,8 @@ const ListView: React.FC<ListViewProps> = ({
             <ul className="list-group list-group-flush px-1 px-sm-2">
               {displayedItems.map((item, index) => (
                 <a
-                  key={item.slug || index}
-                  href={`/notification/${item.slug}`}
+                  key={item.sk || index}
+                  href={`/notification/${makeSlug(item.title, item.sk)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="list-group-item d-flex align-items-center gap-2 py-3 border-0"
