@@ -5,38 +5,48 @@ import { loginUser, signUpUser } from "../services/api";
 
 const API_BASE_URL = "http://localhost:3000";
 
-const SSO_PROVIDERS = [
-  {
-    name: "Google",
-    icon: "https://img.icons8.com/color/28/000000/google-logo.png",
-    url: "https://accounts.google.com/signin",
-  },
-  {
-    name: "Telegram",
-    icon: "https://img.icons8.com/color/28/000000/telegram-app.png",
-    url: "https://t.me/",
-  },
-  {
-    name: "WhatsApp",
-    icon: "https://img.icons8.com/color/28/000000/whatsapp.png",
-    url: "https://wa.me/",
-  },
-  {
-    name: "YouTube",
-    icon: "https://img.icons8.com/color/28/000000/youtube-play.png",
-    url: "https://youtube.com/",
-  },
-  {
-    name: "Instagram",
-    icon: "https://img.icons8.com/color/28/000000/instagram-new.png",
-    url: "https://instagram.com/",
-  },
-  {
-    name: "X",
-    icon: "https://img.icons8.com/ios-filled/28/000000/twitterx--v2.png",
-    url: "https://x.com/",
-  },
-];
+// const SSO_PROVIDERS = [
+//   {
+//     name: "Google",
+//     icon: "https://img.icons8.com/color/28/000000/google-logo.png",
+//     url: "https://accounts.google.com/signin",
+//   },
+//   {
+//     name: "Facebook",
+//     icon: "https://img.icons8.com/color/28/000000/facebook-new.png",
+//     url: "https://www.facebook.com/",
+//   },
+//   {
+//     name: "Telegram",
+//     icon: "https://img.icons8.com/color/28/000000/telegram-app.png",
+//     url: "https://t.me/",
+//   },
+//   {
+//     name: "WhatsApp",
+//     icon: "https://img.icons8.com/color/28/000000/whatsapp.png",
+//     url: "https://wa.me/",
+//   },
+//   {
+//     name: "YouTube",
+//     icon: "https://img.icons8.com/color/28/000000/youtube-play.png",
+//     url: "https://youtube.com/",
+//   },
+//   {
+//     name: "Instagram",
+//     icon: "https://img.icons8.com/color/28/000000/instagram-new.png",
+//     url: "https://instagram.com/",
+//   },
+//   {
+//     name: "X",
+//     icon: "https://img.icons8.com/ios-filled/28/000000/twitterx--v2.png",
+//     url: "https://x.com/",
+//   },
+//   {
+//     name: "LinkedIn",
+//     icon: "https://img.icons8.com/color/28/000000/linkedin.png",
+//     url: "https://www.linkedin.com/",
+//   },
+// ];
 
 type AuthTab = "login" | "register";
 
@@ -203,7 +213,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
         </Button> */}
 
         {/* SSO options row */}
-        <div className="d-flex justify-content-center my-2" style={{ gap: 20 }}>
+        {/* <div className="d-flex justify-content-center my-2" style={{ gap: 20 }}>
           {SSO_PROVIDERS.slice(1).map((p) => (
             <Button
               key={p.name}
@@ -228,7 +238,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({
               />
             </Button>
           ))}
-        </div>
+        </div> */}
         <hr className="my-3" />
 
         {/* FORM */}
