@@ -10,7 +10,7 @@ import {
   BsFileEarmarkText,
 } from "react-icons/bs";
 import { FcViewDetails } from "react-icons/fc";
-import { formatCategoryTitle } from "../../services/utils";
+import { formatCategoryTitle, getId } from "../../services/utils";
 
 /* ---------------- Helpers ---------------- */
 
@@ -141,7 +141,7 @@ export default function NotificationDetailView({
                 ← Dashboard
               </button>
               <a
-                href={`/admin/edit/${notification.id}`}
+                href={`/admin/edit/${getId(notification.sk)}`}
                 className="btn btn-warning btn-sm"
               >
                 Edit
@@ -394,8 +394,8 @@ export default function NotificationDetailView({
                   value={formatDateTime(notification.created_at)}
                 />
                 <LabelValue
-                  label="Updated At:"
-                  value={formatDateTime(notification.updated_at)}
+                  label="Modified At:"
+                  value={formatDateTime(notification.modified_at)}
                 />
                 <LabelValue
                   label="Approved By:"

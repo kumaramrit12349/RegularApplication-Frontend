@@ -3,3 +3,7 @@ export const formatCategoryTitle = (category: string): string => {
     ?.replace(/-/g, " ")
     ?.replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 };
+
+export const getId = (id: string): string => {
+  return id.split('#')[1];
+}

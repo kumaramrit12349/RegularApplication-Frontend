@@ -7,6 +7,7 @@ import {
 import NotificationDetailView from "../../components/Generic/NotificationDetailView";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../components/Toast/Toast";
+import { getId } from "../../services/utils";
 
 const ReviewNotificationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -51,7 +52,7 @@ const ReviewNotificationPage: React.FC = () => {
   }, [id]);
 
   // Modal-action handlers
-  const handleApprove = (id: number) => {
+  const handleApprove = (id: string) => {
     setModal({
       show: true,
       title: "Approve Notification",
@@ -61,7 +62,7 @@ const ReviewNotificationPage: React.FC = () => {
       onConfirm: async () => {
         setModal((m) => ({ ...m, show: false }));
         try {
-          await approveNotification(id.toString());
+          await approveNotification(id);
           showToast("Notification approved successfully!", "success");
           navigate("/admin/dashboard");
         } catch (err: any) {
@@ -95,7 +96,7 @@ const ReviewNotificationPage: React.FC = () => {
         notification={notification}
         isAdmin={true}
         // Pass all admin actions (the component will decide which to show)
-        onApprove={() => handleApprove(notification.id)}
+        onApprove={() => handleApprove(getId(notification.sk))}
       />
       {/* Toast */}
       <Toast

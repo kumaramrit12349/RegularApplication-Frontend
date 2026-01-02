@@ -31,7 +31,7 @@ export const NOTIFICATION_CATEGORIES = [
 // /documents/caste-certificate
 
 export const NOTIFICATION_COLUMNS = {
-  ID: "id", // not required in ui
+  SK: "sk", // not required in ui
   TITLE: "title",
   CATEGORY: "category",
   DEPARTMENT: "department",

@@ -20,11 +20,10 @@ const EditNotificationPage: React.FC = () => {
 
     getNotificationById(id)
       .then((data) => {
-        const n = data.notification;
-        // map backend fields into NotificationFormValues shape if needed
+         const { pk, sk, ...formData } = data.notification;
         const mapped: NotificationFormValues = {
           ...emptyNotificationForm,
-          ...n,
+          ...formData,
         };
         setInitialValues(mapped);
         setLoading(false);
