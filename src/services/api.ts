@@ -112,8 +112,6 @@ export const unarchiveNotification = async (id: string) => {
 };
 
 // fetch notification by Category
-// fetch notification by category (CURSOR BASED)
-// services/api.ts
 export async function fetchNotificationsByCategory(
   category: string,
   limit: number,
@@ -144,14 +142,11 @@ export async function fetchNotificationsByCategory(
   );
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch notifications (${response.status})`
-    );
+    throw new Error(`Failed to fetch notifications (${response.status})`);
   }
 
   return response.json();
 }
-
 
 export const signUpUser = async (
   given_name: string,

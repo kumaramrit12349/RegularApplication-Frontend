@@ -29,6 +29,7 @@ import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
 import TermsAndConditions from "./pages/legal/TermsAndConditions";
 import Disclaimer from "./pages/legal/Disclaimer";
 import AboutUs from "./pages/legal/AboutUs";
+import FeedbackPage from "./pages/feedback/FeedbackPage";
 
 const POPUP_INTERVAL = 90 * 1000;
 
@@ -214,6 +215,9 @@ const AppLayout: React.FC = () => {
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/about" element={<AboutUs />} />
+
+          {/* feedback page */}
+          <Route path="/feedback" element={<FeedbackPage />} />
 
           {/* Catch‑all: wrong URL → home */}
           <Route path="*" element={<Navigate to="/" replace />} />
