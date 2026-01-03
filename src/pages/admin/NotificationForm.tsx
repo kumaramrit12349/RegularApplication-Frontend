@@ -221,6 +221,38 @@ const NotificationForm: React.FC<Props> = ({
           />
         </div>
 
+        {/* ================= STATUS FLAGS ================= */}
+        <h5 className="mt-4">Notification Status</h5>
+
+        <div className="row">
+          {[
+            ["has_admit_card", "Admit Card Available"],
+            ["has_result", "Result Available"],
+            ["has_answer_key", "Answer Key Available"],
+            ["has_syllabus", "Syllabus Available"],
+          ].map(([key, label]) => (
+            <div className="col-md-6 mb-3" key={key}>
+              <div className="form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id={key}
+                  checked={(form as any)[key] || false}
+                  onChange={(e) =>
+                    setForm((p) => ({
+                      ...p,
+                      [key]: e.target.checked,
+                    }))
+                  }
+                />
+                <label className="form-check-label" htmlFor={key}>
+                  {label}
+                </label>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* ================= FEES ================= */}
         <h5 className="mt-4">Fees</h5>
 
