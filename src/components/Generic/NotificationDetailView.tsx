@@ -13,7 +13,7 @@ import {
   BsYoutube,
 } from "react-icons/bs";
 import { FcViewDetails } from "react-icons/fc";
-import { formatCategoryTitle } from "../../services/utils";
+import { formatCategoryTitle, getId } from "../../services/utils";
 import type { INotification } from "../../interface/NotificationInterface";
 
 /* ---------------- Helpers ---------------- */
@@ -155,7 +155,7 @@ export default function NotificationDetailView({
                 ← Dashboard
               </button>
               <a
-                href={`/admin/edit/${notification.sk}`}
+                href={`/admin/edit/${getId(notification.sk)}`}
                 className="btn btn-warning btn-sm"
               >
                 Edit

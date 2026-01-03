@@ -6,6 +6,7 @@ import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../components/Toast/Toast";
 import { NOTIFICATION_CATEGORIES } from "../../constant/SharedConstant";
 import type { INotification } from "../../interface/NotificationInterface";
+import { epochToDateInput, toEpoch } from "../../services/utils";
 
 type Props = {
   mode: "create" | "edit";
@@ -198,9 +199,12 @@ const NotificationForm: React.FC<Props> = ({
             <input
               type="date"
               className="form-control"
-              value={(form as any)[key] || ""}
+              value={epochToDateInput((form as any)[key])}
               onChange={(e) =>
-                setForm((p) => ({ ...p, [key]: e.target.value }))
+                setForm((p) => ({
+                  ...p,
+                  [key]: toEpoch(e.target.value), // convert back to epoch
+                }))
               }
             />
           </div>

@@ -3,7 +3,7 @@
 export interface INotification {
   /* Keys */
   pk?: string;
-  sk?: string;
+  sk: string;
   type?: string;
 
   /* Basic Info */

@@ -22,6 +22,7 @@ export function makeSlug(title: string, sk: string): string {
 }
 
 export const emptyNotificationForm: INotification = {
+  sk: "",
   title: "",
   category: "",
   department: "",
@@ -73,3 +74,30 @@ export const emptyNotificationForm: INotification = {
     other_links: "",
   },
 };
+
+export function epochToDateInput(epoch?: number): string {
+  if (!epoch) return "";
+
+  const d = new Date(epoch);
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+export function toEpoch(dateStr: string): number {
+  if (!dateStr) {
+    throw new Error("Date string is required");
+  }
+
+  // Expecting yyyy-MM-dd from <input type="date">
+  const [year, month, day] = dateStr.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    throw new Error(`Invalid date format: ${dateStr}`);
+  }
+
+  // Create date at UTC midnight
+  return Date.UTC(year, month - 1, day);
+}
