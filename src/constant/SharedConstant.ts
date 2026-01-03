@@ -83,3 +83,43 @@ export const NOTIFICATION_COLUMNS = {
   CREATED_AT: "created_at",
   UPDATED_AT: "updated_at",
 } as const;
+
+
+// constants/socialLinks.ts
+export const APPLYINDIA_SOCIAL_LINKS = [
+  {
+    name: "Facebook",
+    icon: "https://img.icons8.com/color/28/000000/facebook-new.png",
+    url: "https://www.facebook.com/profile.php?id=61585944620623",
+  },
+  {
+    name: "Telegram",
+    icon: "https://img.icons8.com/color/28/000000/telegram-app.png",
+    url: "https://web.telegram.org/k/#@applyindia_online",
+  },
+  {
+    name: "WhatsApp",
+    icon: "https://img.icons8.com/color/28/000000/whatsapp.png",
+    url: "https://whatsapp.com/channel/0029Vb7u8oNCXC3M57Orxa3I",
+  },
+  {
+    name: "YouTube",
+    icon: "https://img.icons8.com/color/28/000000/youtube-play.png",
+    url: "https://youtube.com/@applyindia",
+  },
+  {
+    name: "Instagram",
+    icon: "https://img.icons8.com/color/28/000000/instagram-new.png",
+    url: "https://www.instagram.com/applyindia.online/",
+  },
+  {
+    name: "X",
+    icon: "https://img.icons8.com/ios-filled/28/000000/twitterx--v2.png",
+    url: "https://x.com/ApplyIndia_",
+  },
+  {
+    name: "LinkedIn",
+    icon: "https://img.icons8.com/color/28/000000/linkedin.png",
+    url: "https://www.linkedin.com/company/110909325/admin/dashboard/",
+  },
+];
