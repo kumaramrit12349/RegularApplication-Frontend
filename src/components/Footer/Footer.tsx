@@ -17,8 +17,10 @@ const Footer: React.FC = () => {
           <div className="col-12 col-md-4">
             <h6 className="footer-title">About {WEBSITE_NAME}</h6>
             <p className="footer-text">
-              {WEBSITE_NAME} provides verified government job, exam, and
-              scholarship notifications across India. Stay updated, stay ahead.
+              {WEBSITE_NAME} provides verified government job, entrance exam,
+              admission, and scholarship notifications across India. We ensure
+              timely, authentic updates sourced from official authorities to
+              help you stay informed and ahead.
             </p>
           </div>
 
@@ -86,8 +88,8 @@ const Footer: React.FC = () => {
         <hr className="footer-divider my-4" />
 
         {/* ================= BOTTOM ================= */}
-        <div className="text-center small text-muted">
-          © {currentYear} {WEBSITE_NAME}. All rights reserved.
+        <div className="text-center small footer-copyright">
+          © {new Date().getFullYear()} Apply India. All rights reserved.
         </div>
       </div>
     </footer>
