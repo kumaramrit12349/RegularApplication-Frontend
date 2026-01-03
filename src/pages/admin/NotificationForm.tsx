@@ -1,16 +1,16 @@
 // components/NotificationForm/NotificationForm.tsx
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import type { NotificationFormValues } from "../../types/notification";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../components/Toast/Toast";
 import { NOTIFICATION_CATEGORIES } from "../../constant/SharedConstant";
+import type { INotification } from "../../interface/NotificationInterface";
 
 type Props = {
   mode: "create" | "edit";
-  initialValues: NotificationFormValues;
-  onSubmit: (values: NotificationFormValues) => Promise<void>;
+  initialValues: INotification;
+  onSubmit: (values: Partial<INotification>) => Promise<void>;
 };
 
 const NotificationForm: React.FC<Props> = ({
@@ -18,107 +18,103 @@ const NotificationForm: React.FC<Props> = ({
   initialValues,
   onSubmit,
 }) => {
-  const [form, setForm] = useState<NotificationFormValues>(initialValues);
+  const [form, setForm] = useState<INotification>(initialValues);
   const [saving, setSaving] = useState(false);
-
   const [showModal, setShowModal] = useState(false);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: "success" | "error";
-  }>({
+  const [toast, setToast] = useState({
     show: false,
     message: "",
-    type: "success",
+    type: "success" as "success" | "error",
   });
 
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ show: true, message, type });
+  /* ---------------- Dirty Tracking ---------------- */
+
+  const isDirty = useMemo(
+    () => JSON.stringify(form) !== JSON.stringify(initialValues),
+    [form, initialValues]
+  );
+
+  const buildPatchPayload = (): Partial<INotification> => {
+    const diff: any = {};
+    (Object.keys(form) as (keyof INotification)[]).forEach((key) => {
+      if (JSON.stringify(form[key]) !== JSON.stringify(initialValues[key])) {
+        diff[key] = form[key];
+      }
+    });
+    return diff;
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+  /* ---------------- Helpers ---------------- */
+
+  const handleRootChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const target = e.target;
-    const { name, value, type } = target;
-    const checked = target instanceof HTMLInputElement ? target.checked : false;
-
-    setForm(
-      (prev) =>
-        ({
-          ...prev,
-          [name]:
-            type === "checkbox"
-              ? checked
-              : target.type === "number"
-              ? value === ""
-                ? ""
-                : Number(value)
-              : value,
-        } as NotificationFormValues)
-    );
+    const { name, value, type } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "number" ? (value === "" ? 0 : Number(value)) : value,
+    }));
   };
 
-  const handleShortDescriptionChange = (value: string) => {
-    setForm((prev) => ({ ...prev, short_description: value }));
-  };
-
-  const handleLongDescriptionChange = (value: string) => {
-    setForm((prev) => ({ ...prev, long_description: value }));
-  };
-
-  const handleImportantDatesDetailsChange = (value: string) => {
-    setForm((prev) => ({ ...prev, important_date_details: value }));
-  };
-
-  const handleOtherFeeDetailsChange = (value: string) => {
-    setForm((prev) => ({ ...prev, other_fee_details: value }));
-  };
-
-  const handleAgeRelaxationChange = (value: string) => {
-    setForm((prev) => ({ ...prev, age_relaxation_details: value }));
-  };
-
-  const handleAdditionalDetailsChange = (value: string) => {
-    setForm((prev) => ({ ...prev, additional_details: value }));
+  const handleNestedChange = (
+    section: keyof INotification,
+    field: string,
+    value: any
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [section]: {
+        ...(prev as any)[section],
+        [field]: value,
+      },
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isDirty) return;
     setShowModal(true);
   };
 
   const confirmSubmit = async () => {
     setShowModal(false);
     setSaving(true);
-
     try {
-      await onSubmit(form);
-      showToast(
-        mode === "create"
-          ? "Notification created successfully!"
-          : "Notification updated successfully!",
-        "success"
-      );
+      const payload = mode === "edit" ? buildPatchPayload() : form;
+      await onSubmit(payload);
+      setToast({
+        show: true,
+        message:
+          mode === "create"
+            ? "Notification created successfully!"
+            : "Notification updated successfully!",
+        type: "success",
+      });
     } catch (err: any) {
-      showToast(err?.message || "Failed to save notification", "error");
+      setToast({
+        show: true,
+        message: err?.message || "Failed to save notification",
+        type: "error",
+      });
       setSaving(false);
     }
   };
 
+  /* ---------------- UI ---------------- */
+
   return (
     <>
       <form onSubmit={handleSubmit}>
+        {/* ================= BASIC ================= */}
         <h5 className="mt-4">Basic Information</h5>
+
         <div className="mb-3">
           <label className="form-label">Title *</label>
           <input
-            name="title"
             className="form-control"
+            name="title"
             value={form.title}
-            onChange={handleChange}
+            onChange={handleRootChange}
             required
           />
         </div>
@@ -129,13 +125,13 @@ const NotificationForm: React.FC<Props> = ({
             name="category"
             className="form-select"
             value={form.category}
-            onChange={handleChange}
+            onChange={handleRootChange}
             required
           >
             <option value="">Select</option>
-            {NOTIFICATION_CATEGORIES.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
+            {NOTIFICATION_CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
               </option>
             ))}
           </select>
@@ -144,32 +140,35 @@ const NotificationForm: React.FC<Props> = ({
         <div className="mb-3">
           <label className="form-label">Department</label>
           <input
-            name="department"
             className="form-control"
+            name="department"
             value={form.department}
-            onChange={handleChange}
+            onChange={handleRootChange}
           />
         </div>
 
         <div className="mb-3">
           <label className="form-label">Total Vacancies</label>
           <input
-            name="total_vacancies"
             type="number"
             className="form-control"
+            name="total_vacancies"
             value={form.total_vacancies}
-            onChange={handleChange}
+            onChange={handleRootChange}
           />
         </div>
 
-        {/* Short / Long description */}
+        {/* ================= DETAILS ================= */}
+        <h5 className="mt-4">Descriptions</h5>
+
         <div className="mb-3">
           <label className="form-label">Short Description</label>
           <ReactQuill
             theme="snow"
-            value={form.short_description}
-            onChange={handleShortDescriptionChange}
-            placeholder="Enter short summary..."
+            value={form.details.short_description}
+            onChange={(v) =>
+              handleNestedChange("details", "short_description", v)
+            }
           />
         </div>
 
@@ -177,74 +176,32 @@ const NotificationForm: React.FC<Props> = ({
           <label className="form-label">Long Description</label>
           <ReactQuill
             theme="snow"
-            value={form.long_description}
-            onChange={handleLongDescriptionChange}
-            placeholder="Enter detailed description..."
+            value={form.details.long_description}
+            onChange={(v) =>
+              handleNestedChange("details", "long_description", v)
+            }
           />
         </div>
 
-        {/* Toggles */}
-        <div className="form-check form-switch mb-2">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="admitcard"
-            name="has_admit_card"
-            checked={form.has_admit_card}
-            onChange={handleChange}
-          />
-          <label className="form-check-label" htmlFor="admitcard">
-            Admit Card Published
-          </label>
-        </div>
-
-        <div className="form-check form-switch mb-2">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="result"
-            name="has_result"
-            checked={form.has_result}
-            onChange={handleChange}
-          />
-          <label className="form-check-label" htmlFor="result">
-            Result Published
-          </label>
-        </div>
-
-        <div className="form-check form-switch mb-4">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="answerkey"
-            name="has_answer_key"
-            checked={form.has_answer_key}
-            onChange={handleChange}
-          />
-          <label className="form-check-label" htmlFor="answerkey">
-            Answer Key Published
-          </label>
-        </div>
-
-        {/* Important dates */}
+        {/* ================= IMPORTANT DATES ================= */}
         <h5 className="mt-4">Important Dates</h5>
+
         {[
-          "start_date",
-          "last_date_to_apply",
-          "exam_date",
-          "admit_card_available_date",
-          "result_date",
-        ].map((field) => (
-          <div className="mb-3" key={field}>
-            <label className="form-label text-capitalize">
-              {field.replace(/_/g, " ")}
-            </label>
+          { key: "start_date", label: "Start Date" },
+          { key: "last_date_to_apply", label: "Last Date to Apply" },
+          { key: "exam_date", label: "Exam Date" },
+          { key: "admit_card_date", label: "Admit Card Date" },
+          { key: "result_date", label: "Result Date" },
+        ].map(({ key, label }) => (
+          <div className="mb-3" key={key}>
+            <label className="form-label">{label}</label>
             <input
-              name={field}
               type="date"
               className="form-control"
-              value={(form as any)[field] || ""}
-              onChange={handleChange}
+              value={(form as any)[key] || ""}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, [key]: e.target.value }))
+              }
             />
           </div>
         ))}
@@ -253,134 +210,111 @@ const NotificationForm: React.FC<Props> = ({
           <label className="form-label">Important Date Details</label>
           <ReactQuill
             theme="snow"
-            value={form.important_date_details || ""}
-            onChange={handleImportantDatesDetailsChange}
+            value={form.details.important_date_details || ""}
+            onChange={(v) =>
+              handleNestedChange("details", "important_date_details", v)
+            }
           />
         </div>
 
-        {/* Fees */}
+        {/* ================= FEES ================= */}
         <h5 className="mt-4">Fees</h5>
-        {["general_fee", "obc_fee", "sc_fee", "st_fee", "ph_fee"].map(
-          (field) => (
-            <div className="mb-3" key={field}>
-              <label className="form-label text-capitalize">
-                {field.replace(/_/g, " ")}
-              </label>
-              <input
-                name={field}
-                type="number"
-                step="0.01"
-                className="form-control"
-                value={(form as any)[field]}
-                onChange={handleChange}
-              />
-            </div>
-          )
-        )}
+
+        {[
+          ["general_fee", "General Fee"],
+          ["obc_fee", "OBC Fee"],
+          ["sc_fee", "SC Fee"],
+          ["st_fee", "ST Fee"],
+          ["ph_fee", "PH Fee"],
+        ].map(([key, label]) => (
+          <div className="mb-3" key={key}>
+            <label className="form-label">{label}</label>
+            <input
+              type="number"
+              className="form-control"
+              value={(form.fee as any)[key]}
+              onChange={(e) =>
+                handleNestedChange("fee", key, Number(e.target.value))
+              }
+            />
+          </div>
+        ))}
 
         <div className="mb-3">
           <label className="form-label">Other Fee Details</label>
           <ReactQuill
             theme="snow"
-            value={form.other_fee_details}
-            onChange={handleOtherFeeDetailsChange}
+            value={form.fee.other_fee_details || ""}
+            onChange={(v) => handleNestedChange("fee", "other_fee_details", v)}
           />
         </div>
 
-        {/* Ages */}
+        {/* ================= ELIGIBILITY ================= */}
         <h5 className="mt-4">Eligibility</h5>
-        <div className="mb-3">
-          <label className="form-label">Min Age</label>
-          <input
-            name="min_age"
-            type="number"
-            className="form-control"
-            value={form.min_age}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Max Age</label>
-          <input
-            name="max_age"
-            type="number"
-            className="form-control"
-            value={form.max_age}
-            onChange={handleChange}
-          />
-        </div>
+
+        {[
+          ["min_age", "Minimum Age"],
+          ["max_age", "Maximum Age"],
+          ["qualification", "Qualification"],
+          ["specialization", "Specialization"],
+          ["min_percentage", "Minimum Percentage"],
+        ].map(([key, label]) => (
+          <div className="mb-3" key={key}>
+            <label className="form-label">{label}</label>
+            <input
+              className="form-control"
+              type={
+                key.includes("age") || key.includes("percentage")
+                  ? "number"
+                  : "text"
+              }
+              value={(form.eligibility as any)[key]}
+              onChange={(e) =>
+                handleNestedChange(
+                  "eligibility",
+                  key,
+                  key.includes("age") || key.includes("percentage")
+                    ? Number(e.target.value)
+                    : e.target.value
+                )
+              }
+            />
+          </div>
+        ))}
 
         <div className="mb-3">
           <label className="form-label">Age Relaxation Details</label>
           <ReactQuill
             theme="snow"
-            value={form.age_relaxation_details}
-            onChange={handleAgeRelaxationChange}
+            value={form.eligibility.age_relaxation_details || ""}
+            onChange={(v) =>
+              handleNestedChange("eligibility", "age_relaxation_details", v)
+            }
           />
         </div>
 
-        {/* Education */}
-        <h5 className="mt-4">Educational Qualifications</h5>
-        <div className="mb-3">
-          <label className="form-label">Qualification</label>
-          <input
-            name="qualification"
-            className="form-control"
-            value={form.qualification}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Specialization</label>
-          <input
-            name="specialization"
-            className="form-control"
-            value={form.specialization}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Min Percentage</label>
-          <input
-            name="min_percentage"
-            type="number"
-            step="0.01"
-            className="form-control"
-            value={form.min_percentage}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Additional Details</label>
-          <ReactQuill
-            theme="snow"
-            value={form.additional_details || ""}
-            onChange={handleAdditionalDetailsChange}
-          />
-        </div>
-
-        {/* Links */}
+        {/* ================= LINKS ================= */}
         <h5 className="mt-4">Links</h5>
+
         {[
-          "youtube_link",
           "apply_online_url",
           "notification_pdf_url",
           "official_website_url",
           "admit_card_url",
           "answer_key_url",
           "result_url",
+          "youtube_link",
           "other_links",
-        ].map((field) => (
-          <div className="mb-3" key={field}>
-            <label className="form-label text-capitalize">
-              {field.replace(/_/g, " ")}
+        ].map((key) => (
+          <div className="mb-3" key={key}>
+            <label className="form-label">
+              {key.replace(/_/g, " ").toUpperCase()}
             </label>
             <input
-              name={field}
               type="url"
               className="form-control"
-              value={(form as any)[field] || ""}
-              onChange={handleChange}
+              value={(form.links as any)[key] || ""}
+              onChange={(e) => handleNestedChange("links", key, e.target.value)}
             />
           </div>
         ))}
@@ -388,7 +322,7 @@ const NotificationForm: React.FC<Props> = ({
         <button
           type="submit"
           className="btn btn-primary mt-4"
-          disabled={saving}
+          disabled={!isDirty || saving}
         >
           {saving
             ? mode === "create"
@@ -403,11 +337,7 @@ const NotificationForm: React.FC<Props> = ({
       <ConfirmModal
         show={showModal}
         title={mode === "create" ? "Add Notification" : "Update Notification"}
-        message={
-          mode === "create"
-            ? "Are you sure you want to create this notification?"
-            : "Are you sure you want to update this notification?"
-        }
+        message="Are you sure you want to proceed?"
         confirmText={mode === "create" ? "Create" : "Update"}
         confirmVariant="primary"
         onConfirm={confirmSubmit}

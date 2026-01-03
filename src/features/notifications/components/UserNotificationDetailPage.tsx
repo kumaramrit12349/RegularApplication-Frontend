@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  getNotificationById,
-} from "../../../services/api";
+import { getNotificationById } from "../../../services/api";
 import NotificationDetailView from "../../../components/Generic/NotificationDetailView";
 
 const UserNotificationDetailPage: React.FC = () => {
@@ -10,7 +8,6 @@ const UserNotificationDetailPage: React.FC = () => {
     slug: string;
     id: string;
   }>();
-  // const id = "9e0944c6-e351-4ff8-9eac-2c26c217fd85";
   const [notification, setNotification] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 

@@ -8,9 +8,13 @@ import {
   BsGear,
   BsDownload,
   BsFileEarmarkText,
+  BsGlobe,
+  BsCheckCircle,
+  BsYoutube,
 } from "react-icons/bs";
 import { FcViewDetails } from "react-icons/fc";
-import { formatCategoryTitle, getId } from "../../services/utils";
+import { formatCategoryTitle } from "../../services/utils";
+import type { INotification } from "../../interface/NotificationInterface";
 
 /* ---------------- Helpers ---------------- */
 
@@ -23,8 +27,13 @@ const formatDate = (d?: string) =>
       })
     : "Not Released";
 
-const formatDateTime = (d?: string) =>
-  d ? new Date(d).toLocaleString("en-IN") : "—";
+const formatDateTime = (d?: number | string | null) => {
+  if (!d) return "—";
+
+  const date = typeof d === "number" ? new Date(d) : new Date(d);
+
+  return isNaN(date.getTime()) ? "—" : date.toLocaleString("en-IN");
+};
 
 const formatCurrency = (amount?: string | number) =>
   amount ? `₹${parseFloat(String(amount)).toLocaleString()}` : "—";
@@ -36,21 +45,25 @@ const formatPercentage = (value?: string | number) => {
   return `${Number(value)}`;
 };
 
-const getGroupedFees = (notification: any) => {
+const getGroupedFees = (fee?: INotification["fee"]) => {
+  if (!fee) return [];
+
   const map: Record<string, string[]> = {};
+
   const fees = [
     { key: "general_fee", label: "Gen" },
     { key: "obc_fee", label: "OBC" },
     { key: "sc_fee", label: "SC" },
     { key: "st_fee", label: "ST" },
     { key: "ph_fee", label: "PH" },
-  ];
+  ] as const;
 
   fees.forEach(({ key, label }) => {
-    const value = formatCurrency(notification[key]);
-    if (value !== "—") {
-      map[value] = map[value] || [];
-      map[value].push(label);
+    const value = fee[key];
+    if (value !== undefined && value !== null) {
+      const formatted = formatCurrency(value);
+      map[formatted] = map[formatted] || [];
+      map[formatted].push(label);
     }
   });
 
@@ -84,7 +97,7 @@ const LabelValue = ({
   fallback,
 }: {
   label: string;
-  value?: string | null;
+  value?: string | number | null;
   highlight?: boolean;
   fallback?: string;
 }) => {
@@ -121,15 +134,16 @@ export default function NotificationDetailView({
   onApprove,
   approving,
 }: {
-  notification: any;
+  notification: INotification;
   isAdmin?: boolean;
   onApprove?: () => void;
   approving?: boolean;
 }) {
+  if (!notification) return null;
+
   return (
     <main className="container py-4">
       <div className="row justify-content-center">
-        {/* 🔑 SINGLE WIDTH COLUMN */}
         <div className="col-lg-10 col-xl-9">
           {/* ---------------- Admin Bar ---------------- */}
           {isAdmin && (
@@ -141,7 +155,7 @@ export default function NotificationDetailView({
                 ← Dashboard
               </button>
               <a
-                href={`/admin/edit/${getId(notification.sk)}`}
+                href={`/admin/edit/${notification.sk}`}
                 className="btn btn-warning btn-sm"
               >
                 Edit
@@ -160,22 +174,13 @@ export default function NotificationDetailView({
 
           {/* ---------------- Title ---------------- */}
           <div className="text-center mb-4">
-            <h1
-              className="fw-bold mb-3 px-2"
-              style={{
-                fontSize: "clamp(1.4rem, 5vw, 2.2rem)",
-                lineHeight: 1.3,
-              }}
-            >
-              {notification.title}
-            </h1>
+            <h1 className="fw-bold mb-3">{notification.title}</h1>
 
-            {notification.short_description && (
-              <div className="short-description-wrapper bg-light border rounded-3 p-3 text-start">
+            {notification.details?.short_description && (
+              <div className="bg-light border rounded-3 p-3 text-start">
                 <div
-                  className="short-description-content text-muted lh-lg overflow-hidden"
                   dangerouslySetInnerHTML={{
-                    __html: notification.short_description,
+                    __html: notification.details.short_description,
                   }}
                 />
               </div>
@@ -186,7 +191,6 @@ export default function NotificationDetailView({
           <div className="row g-4 mb-4">
             <div className="col-md-6">
               <Card title="Basic Details" icon={<FcViewDetails />}>
-                <LabelValue label="Title:" value={notification.title} />
                 <LabelValue
                   label="Category:"
                   value={formatCategoryTitle(notification.category)}
@@ -196,7 +200,7 @@ export default function NotificationDetailView({
                   value={notification.department}
                 />
                 <LabelValue
-                  label="Total Vacancy:"
+                  label="Total Vacancies:"
                   value={notification.total_vacancies}
                 />
               </Card>
@@ -208,29 +212,47 @@ export default function NotificationDetailView({
                   label="Start Date:"
                   value={formatDate(notification.start_date)}
                 />
+
                 <LabelValue
                   label="Last Date To Apply:"
                   value={formatDate(notification.last_date_to_apply)}
                   highlight
                 />
+
                 <LabelValue
                   label="Exam Date:"
                   value={formatDate(notification.exam_date)}
                 />
-                <LabelValue
-                  label="Admit Card:"
-                  value={formatDate(notification.admit_card_available_date)}
-                />
-                <LabelValue
-                  label="Result:"
+
+                {/* <LabelValue
+                  label="Admit Card Date:"
+                  value={formatDate(notification.admit_card_date)}
+                  fallback="Not Released"
+                /> */}
+
+                {/* <LabelValue
+                  label="Result Date:"
                   value={formatDate(notification.result_date)}
-                />
+                  fallback="Not Released"
+                /> */}
+
+                {/* 🔹 Important Date Notes */}
+                {notification.details?.important_date_details && (
+                  <div className="mt-3">
+                    <div
+                      className="text-muted lh-lg"
+                      dangerouslySetInnerHTML={{
+                        __html: notification.details.important_date_details,
+                      }}
+                    />
+                  </div>
+                )}
               </Card>
             </div>
 
             <div className="col-md-6">
               <Card title="Fees" icon={<BsCurrencyRupee />}>
-                {getGroupedFees(notification).map(([fee, cats]) => (
+                {getGroupedFees(notification.fee).map(([fee, cats]) => (
                   <LabelValue
                     key={fee}
                     label={`${cats.join("/")} Fee:`}
@@ -244,27 +266,29 @@ export default function NotificationDetailView({
               <Card title="Eligibility" icon={<BsFillPersonFill />}>
                 <LabelValue
                   label="Age:"
-                  value={`${notification.min_age ?? "—"} - ${
-                    notification.max_age ?? "—"
+                  value={`${notification.eligibility?.min_age ?? "—"} - ${
+                    notification.eligibility?.max_age ?? "—"
                   } Years`}
                 />
                 <LabelValue
                   label="Qualification:"
-                  value={notification.qualification}
+                  value={notification.eligibility?.qualification}
                 />
                 <LabelValue
                   label="Specialization:"
-                  value={notification.specialization}
+                  value={notification.eligibility?.specialization}
                 />
                 <LabelValue
                   label="Minimum %:"
-                  value={formatPercentage(notification.min_percentage)}
+                  value={formatPercentage(
+                    notification.eligibility?.min_percentage
+                  )}
                 />
               </Card>
             </div>
           </div>
 
-          {/* ---------------- Important Links (FULL WIDTH) ---------------- */}
+          {/* ---------------- Important Links ---------------- */}
           <div className="card border-0 shadow-sm rounded-4 mb-4">
             <div className="card-body p-4">
               <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
@@ -272,100 +296,122 @@ export default function NotificationDetailView({
                 Important Links
               </h5>
 
-              {notification.apply_online_url && (
+              {/* 🔵 Apply Online */}
+              {notification.links?.apply_online_url && (
                 <a
-                  href={notification.apply_online_url}
+                  href={notification.links.apply_online_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary w-100 mb-3 d-flex justify-content-center align-items-center gap-2"
+                  className="btn btn-primary w-100 mb-4 d-flex justify-content-center align-items-center gap-2"
                   style={{ minHeight: 52 }}
                 >
-                  <BsArrowUpRightCircle />
+                  <BsArrowUpRightCircle size={18} />
                   Apply Online
                 </a>
               )}
 
               <div className="row g-3">
-                {notification.admit_card_url && (
-                  <div className="col-12 col-sm-6">
+                {/* 🟢 Admit Card */}
+                {notification.links?.admit_card_url && (
+                  <div className="col-12 col-md-6">
                     <a
-                      href={notification.admit_card_url}
+                      href={notification.links.admit_card_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-success w-100"
+                      className="btn btn-success w-100 d-flex justify-content-center align-items-center gap-2"
                     >
-                      <BsDownload /> Admit Card
+                      <BsDownload size={18} />
+                      Admit Card
                     </a>
                   </div>
                 )}
 
-                {notification.notification_pdf_url && (
-                  <div className="col-12 col-sm-6">
+                {/* 🔴 Notification PDF */}
+                {notification.links?.notification_pdf_url && (
+                  <div className="col-12 col-md-6">
                     <a
-                      href={notification.notification_pdf_url}
+                      href={notification.links.notification_pdf_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-outline-danger w-100"
+                      className="btn btn-outline-danger w-100 d-flex justify-content-center align-items-center gap-2"
                     >
-                      <BsFileEarmarkText /> Notification
+                      <BsFileEarmarkText size={18} />
+                      Notification PDF
                     </a>
                   </div>
                 )}
 
-                {notification.official_website_url && (
-                  <div className="col-12 col-sm-6">
+                {/* 🌐 Official Website */}
+                {notification.links?.official_website_url && (
+                  <div className="col-12 col-md-6">
                     <a
-                      href={notification.official_website_url}
+                      href={notification.links.official_website_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-outline-dark w-100"
+                      className="btn btn-outline-dark w-100 d-flex justify-content-center align-items-center gap-2"
                     >
+                      <BsGlobe size={18} />
                       Official Website
                     </a>
                   </div>
                 )}
 
-                {notification.result_url ? (
-                  <div className="col-12 col-sm-6">
+                {/* 🟡 Result */}
+                {notification.links?.result_url && (
+                  <div className="col-12 col-md-6">
                     <a
-                      href={notification.result_url}
+                      href={notification.links.result_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-warning w-100"
+                      className="btn btn-warning w-100 d-flex justify-content-center align-items-center gap-2"
                     >
-                      Check Result
+                      <BsCheckCircle size={18} />
+                      Result
                     </a>
-                  </div>
-                ) : (
-                  <div className="col-12 col-sm-6">
-                    <button className="btn btn-secondary w-100" disabled>
-                      Result (Soon)
-                    </button>
                   </div>
                 )}
 
-                {notification.answer_key_url && (
-                  <div className="col-12 col-sm-6">
+                {/* ⚪ Answer Key */}
+                {notification.links?.answer_key_url && (
+                  <div className="col-12 col-md-6">
                     <a
-                      href={notification.answer_key_url}
+                      href={notification.links.answer_key_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-outline-secondary w-100"
+                      className="btn btn-outline-secondary w-100 d-flex justify-content-center align-items-center gap-2"
                     >
+                      <BsFileEarmarkText size={18} />
                       Answer Key
                     </a>
                   </div>
                 )}
 
-                {notification.other_links && (
-                  <div className="col-12 col-sm-6">
+                {/* 🔴 YouTube */}
+                {notification.links?.youtube_link && (
+                  <div className="col-12 col-md-6">
                     <a
-                      href={notification.other_links}
+                      href={notification.links.youtube_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn btn-outline-dark w-100"
+                      className="btn btn-outline-danger w-100 d-flex justify-content-center align-items-center gap-2"
                     >
-                      Other
+                      <BsYoutube size={18} />
+                      YouTube
+                    </a>
+                  </div>
+                )}
+
+                {/* 🔗 Other Links */}
+                {notification.links?.other_links && (
+                  <div className="col-12 col-md-6">
+                    <a
+                      href={notification.links.other_links}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-dark w-100 d-flex justify-content-center align-items-center gap-2"
+                    >
+                      <BsLink45Deg size={18} />
+                      Other Links
                     </a>
                   </div>
                 )}
@@ -374,12 +420,11 @@ export default function NotificationDetailView({
           </div>
 
           {/* ---------------- Long Description ---------------- */}
-          {notification.long_description && (
-            <div className="long-description-wrapper bg-light border rounded-3 p-3 mb-4">
+          {notification.details?.long_description && (
+            <div className="bg-light border rounded-3 p-3 mb-4">
               <div
-                className="long-description-content text-muted lh-lg overflow-hidden"
                 dangerouslySetInnerHTML={{
-                  __html: notification.long_description,
+                  __html: notification.details.long_description,
                 }}
               />
             </div>
@@ -387,29 +432,31 @@ export default function NotificationDetailView({
 
           {/* ---------------- Admin Metadata ---------------- */}
           {isAdmin && (
-            <div className="mb-5">
-              <Card title="Admin Metadata" icon={<BsGear />}>
-                <LabelValue
-                  label="Created At:"
-                  value={formatDateTime(notification.created_at)}
-                />
-                <LabelValue
-                  label="Modified At:"
-                  value={formatDateTime(notification.modified_at)}
-                />
-                <LabelValue
-                  label="Approved By:"
-                  value={notification.approved_by || "Not approved yet"}
-                />
-                <LabelValue
-                  label="Approved At:"
-                  value={
-                    notification.approved_at
-                      ? formatDateTime(notification.approved_at)
-                      : "Pending approval"
-                  }
-                />
-              </Card>
+            <div className="row mb-5">
+              <div className="col-12">
+                <Card title="Admin Metadata" icon={<BsGear />}>
+                  <LabelValue
+                    label="Created At:"
+                    value={formatDateTime(notification.created_at)}
+                  />
+                  <LabelValue
+                    label="Modified At:"
+                    value={formatDateTime(notification.modified_at)}
+                  />
+                  <LabelValue
+                    label="Approved By:"
+                    value={notification.approved_by || "Pending"}
+                  />
+                  <LabelValue
+                    label="Approved At:"
+                    value={
+                      notification.approved_at
+                        ? formatDateTime(notification.approved_at)
+                        : "Pending approval"
+                    }
+                  />
+                </Card>
+              </div>
             </div>
           )}
         </div>

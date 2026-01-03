@@ -1,18 +1,16 @@
-// pages/AddNotificationPage.tsx
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { addNotification } from "../../services/api";
-import {
-  emptyNotificationForm,
-  type NotificationFormValues,
-} from "../../types/notification";
 import NotificationForm from "./NotificationForm";
+import type { INotification } from "../../interface/NotificationInterface";
+import { emptyNotificationForm } from "../../services/utils";
 
 const AddNotificationPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleCreate = async (values: NotificationFormValues) => {
-    await addNotification(values);
+  const handleCreate = async (values: Partial<INotification>) => {
+    // 🔑 CREATE requires full payload
+    await addNotification(values as INotification);
     navigate("/admin/dashboard");
   };
 

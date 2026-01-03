@@ -1,50 +1,38 @@
-// pages/EditNotificationPage.tsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getNotificationById, updateNotification } from "../../services/api";
-import {
-  emptyNotificationForm,
-  type NotificationFormValues,
-} from "../../types/notification";
 import NotificationForm from "./NotificationForm";
+import type { INotification } from "../../interface/NotificationInterface";
 
 const EditNotificationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [initialValues, setInitialValues] =
-    useState<NotificationFormValues | null>(null);
+  const [initialValues, setInitialValues] = useState<INotification | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
 
     getNotificationById(id)
-      .then((data) => {
-         const { pk, sk, ...formData } = data.notification;
-        const mapped: NotificationFormValues = {
-          ...emptyNotificationForm,
-          ...formData,
-        };
-        setInitialValues(mapped);
+      .then((res) => {
+        setInitialValues(res.notification);
         setLoading(false);
       })
-      .catch(() => {
-        navigate("/admin/dashboard");
-      });
+      .catch(() => navigate("/admin/dashboard"));
   }, [id, navigate]);
 
-  const handleUpdate = async (values: NotificationFormValues) => {
+  const handleUpdate = async (values: Partial<INotification>) => {
     if (!id) return;
-    await updateNotification(id, values);
+    await updateNotification(id, values); // ✅ partial update
     navigate("/admin/dashboard");
   };
 
   if (loading || !initialValues) {
     return (
       <div className="container mt-5 text-center">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+        <div className="spinner-border text-primary" />
       </div>
     );
   }

@@ -1,4 +1,4 @@
-import type { NotificationForm } from "../Interfaces/Notification";
+import type { INotification } from "../interface/NotificationInterface";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:4000/api";
@@ -14,7 +14,7 @@ export interface AuthStatus {
 }
 
 // Add notification with all related data
-export const addNotification = async (data: NotificationForm) => {
+export const addNotification = async (data: INotification) => {
   const response = await fetch(`${API_BASE_URL}/notification/add`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -48,7 +48,9 @@ export const fetchNotifications = async () => {
 
 // Get single notification by slug
 export const getNotificationBySlug = async (slug: string) => {
-  const response = await fetch(`${API_BASE_URL}/notification/getBySlug/${slug}`);
+  const response = await fetch(
+    `${API_BASE_URL}/notification/getBySlug/${slug}`
+  );
   if (!response.ok) throw new Error("Failed to fetch notification");
   return response.json();
 };
