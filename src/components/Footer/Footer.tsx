@@ -1,19 +1,23 @@
 import React from "react";
-import { APPLYINDIA_SOCIAL_LINKS, WEBSITE_NAME } from "../../constant/SharedConstant";
+import { Link } from "react-router-dom";
+import {
+  APPLYINDIA_SOCIAL_LINKS,
+  WEBSITE_NAME,
+} from "../../constant/SharedConstant";
 
 const Footer: React.FC = () => {
-  return (
-    <footer className="footer-bg text-light mt-auto">
-      <div className="container py-5">
+  const currentYear = new Date().getFullYear();
 
+  return (
+    <footer className="footer-bg text-light mt-auto" role="contentinfo">
+      <div className="container py-5">
         {/* ================= MAIN CONTENT ================= */}
         <div className="row gy-4 align-items-start text-center text-md-start">
-
           {/* ---------- About ---------- */}
           <div className="col-12 col-md-4">
-            <h6 className="footer-title">About Apply India</h6>
+            <h6 className="footer-title">About {WEBSITE_NAME}</h6>
             <p className="footer-text">
-              Apply India provides verified government job, exam, and
+              {WEBSITE_NAME} provides verified government job, exam, and
               scholarship notifications across India. Stay updated, stay ahead.
             </p>
           </div>
@@ -21,11 +25,19 @@ const Footer: React.FC = () => {
           {/* ---------- Legal ---------- */}
           <div className="col-12 col-md-4">
             <h6 className="footer-title">Legal</h6>
-            <ul className="list-unstyled footer-links">
-              <li><a href="/privacy">Privacy Policy</a></li>
-              <li><a href="/terms">Terms & Conditions</a></li>
-              <li><a href="/disclaimer">Disclaimer</a></li>
-              <li><a href="/about">About Us</a></li>
+            <ul className="list-unstyled footer-links mb-0">
+              <li>
+                <Link to="/privacy">Privacy Policy</Link>
+              </li>
+              <li>
+                <Link to="/terms">Terms & Conditions</Link>
+              </li>
+              <li>
+                <Link to="/disclaimer">Disclaimer</Link>
+              </li>
+              <li>
+                <Link to="/about">About Us</Link>
+              </li>
             </ul>
           </div>
 
@@ -33,7 +45,10 @@ const Footer: React.FC = () => {
           <div className="col-12 col-md-4">
             <h6 className="footer-title">Connect With Us</h6>
 
-            <div className="social-wrap justify-content-center justify-content-md-start">
+            <div
+              className="social-wrap d-flex gap-3 justify-content-center justify-content-md-start"
+              aria-label="Social media links"
+            >
               {APPLYINDIA_SOCIAL_LINKS.map((item) => (
                 <a
                   key={item.name}
@@ -41,17 +56,28 @@ const Footer: React.FC = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={item.name}
+                  title={item.name}
                   className="social-icon"
                 >
-                  <img src={item.icon} alt={item.name} />
+                  <img
+                    src={item.icon}
+                    alt={item.name}
+                    loading="lazy"
+                    width={20}
+                    height={20}
+                  />
                 </a>
               ))}
             </div>
 
             <div className="mt-3">
-              <a href="/feedback" className="btn btn-outline-light btn-sm">
+              <Link
+                to="/feedback"
+                className="btn btn-outline-light btn-sm"
+                aria-label="Send feedback"
+              >
                 Send Feedback
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -61,7 +87,7 @@ const Footer: React.FC = () => {
 
         {/* ================= BOTTOM ================= */}
         <div className="text-center small text-muted">
-          © {new Date().getFullYear()} {WEBSITE_NAME}. All rights reserved.
+          © {currentYear} {WEBSITE_NAME}. All rights reserved.
         </div>
       </div>
     </footer>

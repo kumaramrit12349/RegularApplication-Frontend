@@ -25,6 +25,10 @@ import VerifyAccountPopup from "./components/VerifyAccount";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import CategoryView from "./features/notifications/components/CategoryView";
 import UserNotificationDetailPage from "./features/notifications/components/UserNotificationDetailPage";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
+import TermsAndConditions from "./pages/legal/TermsAndConditions";
+import Disclaimer from "./pages/legal/Disclaimer";
+import AboutUs from "./pages/legal/AboutUs";
 
 const POPUP_INTERVAL = 90 * 1000;
 
@@ -204,6 +208,12 @@ const AppLayout: React.FC = () => {
             path="/notification/:slug/:id"
             element={<UserNotificationDetailPage />}
           />
+
+          {/* Legal pages */}
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/about" element={<AboutUs />} />
 
           {/* Catch‑all: wrong URL → home */}
           <Route path="*" element={<Navigate to="/" replace />} />
