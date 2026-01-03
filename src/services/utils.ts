@@ -18,7 +18,6 @@ export function makeSlug(title: string, sk: string): string {
     .replace(/\s+/g, "-") // replace spaces with hyphen
     .replace(/-+/g, "-"); // remove multiple hyphens
 
-  console.log("${baseSlug}/${sk}", `${baseSlug}/${sk}`);
   return `${baseSlug}/${sk}`;
 }
 
