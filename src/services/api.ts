@@ -1,4 +1,5 @@
 import type { INotification } from "../interface/NotificationInterface";
+import type { HomePageNotification } from "../types/notification";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:4000/api";
@@ -111,30 +112,46 @@ export const unarchiveNotification = async (id: string) => {
 };
 
 // fetch notification by Category
-export const fetchNotificationsByCategory = async (
+// fetch notification by category (CURSOR BASED)
+// services/api.ts
+export async function fetchNotificationsByCategory(
   category: string,
-  page: number,
   limit: number,
+  lastEvaluatedKey?: string,
   searchValue?: string
-) => {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-  });
+): Promise<{
+  data: HomePageNotification[];
+  lastEvaluatedKey?: string;
+}> {
+  const params: Record<string, string> = {
+    limit: String(limit),
+  };
 
-  if (searchValue && searchValue.trim() !== "") {
-    params.append("searchValue", searchValue);
+  if (searchValue?.trim()) {
+    params.searchValue = searchValue;
+  }
+
+  if (lastEvaluatedKey) {
+    params.lastEvaluatedKey = lastEvaluatedKey;
   }
 
   const response = await fetch(
-    `${API_BASE_URL}/notification/category/${encodeURIComponent(
-      category
-    )}?${params}`
+    `${API_BASE_URL}/notification/category/${encodeURIComponent(category)}?` +
+      new URLSearchParams(params).toString(),
+    {
+      cache: "no-store", // ✅ IMPORTANT
+    }
   );
 
-  if (!response.ok) throw new Error("Failed to fetch notifications");
-  return await response.json();
-};
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch notifications (${response.status})`
+    );
+  }
+
+  return response.json();
+}
+
 
 export const signUpUser = async (
   given_name: string,
