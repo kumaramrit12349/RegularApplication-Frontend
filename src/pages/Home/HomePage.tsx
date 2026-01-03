@@ -12,7 +12,7 @@ interface GroupedNotifications {
   [category: string]: HomePageNotification[];
 }
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 100;
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
