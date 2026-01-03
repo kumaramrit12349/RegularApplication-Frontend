@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ListView from "./ListView";
 import { fetchNotificationsByCategory } from "../../../services/api";
 import type { HomePageNotification } from "../../../types/notification";
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 100;
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -18,56 +18,74 @@ const CategoryView: React.FC = () => {
   const searchValue = query.get("searchValue") ?? "";
 
   const [items, setItems] = useState<HomePageNotification[]>([]);
-  const [page, setPage] = useState(1);
+  const [lastKey, setLastKey] = useState<string | undefined>(undefined);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ prevents race conditions
+  const isFetchingRef = useRef(false);
+
+  /* ================= RESET ON CHANGE ================= */
 
   useEffect(() => {
     setItems([]);
-    setPage(1);
+    setLastKey(undefined);
     setHasMore(true);
     setLoading(true);
-    loadPage(1, true);
+    isFetchingRef.current = false;
+    loadMore(true);
     // eslint-disable-next-line
   }, [decodedCategory, searchValue]);
 
-  const loadPage = async (pg: number, isFirst = false) => {
+  /* ================= LOAD MORE ================= */
+
+  const loadMore = async (isFirst = false) => {
+    if (isFetchingRef.current) return;
+    if (!hasMore && !isFirst) return;
+
+    isFetchingRef.current = true;
+
     try {
       const res = await fetchNotificationsByCategory(
         decodedCategory,
-        pg,
         PAGE_SIZE,
+        isFirst ? undefined : lastKey,
         searchValue
       );
-      if (isFirst) setItems(res.data);
-      else setItems((prev) => [...prev, ...res.data]);
-      setHasMore(res.hasMore);
-    } catch {
+
+      setItems(prev =>
+        isFirst ? res.data : [...prev, ...res.data]
+      );
+
+      setLastKey(res.lastEvaluatedKey);
+      setHasMore(Boolean(res.lastEvaluatedKey));
+    } catch (error) {
+      console.error("Failed to load notifications", error);
       setHasMore(false);
     } finally {
       setLoading(false);
-      setPage(pg + 1);
+      isFetchingRef.current = false;
     }
   };
+
+  /* ================= UI ================= */
 
   return (
     <div className="container py-3 px-2 px-md-4">
       <div className="row justify-content-center">
         <div className="col-12 col-md-10 col-lg-8">
-          <h2
-            className="mb-3 text-center text-capitalize"
-            style={{ fontSize: "1.6rem" }}
-          >
+          <h2 className="mb-3 text-center text-capitalize">
             {decodedCategory.replace(/-/g, " ")}
             {searchValue && (
-              <span className="text-muted ms-2" style={{ fontSize: "1rem" }}>
+              <span className="text-muted ms-2">
                 (Search: "{searchValue}")
               </span>
             )}
           </h2>
+
           {loading && items.length === 0 ? (
             <div className="text-center py-5">
-              <span className="spinner-border text-primary" role="status" />
+              <span className="spinner-border text-primary" />
             </div>
           ) : items.length === 0 ? (
             <div className="text-center py-5 text-muted">
@@ -76,19 +94,19 @@ const CategoryView: React.FC = () => {
           ) : (
             <InfiniteScroll
               dataLength={items.length}
-              next={() => loadPage(page)}
+              next={() => loadMore(false)}
               hasMore={hasMore}
               loader={
                 <div className="text-center py-4">
-                  <span className="spinner-border text-primary" role="status" />
+                  <span className="spinner-border text-primary" />
                 </div>
               }
               endMessage={
-                items.length > 0 && !hasMore && items.length >= PAGE_SIZE ? (
+                !hasMore && (
                   <p className="text-center text-muted py-4 mb-0">
                     <b>No more notifications.</b>
                   </p>
-                ) : null
+                )
               }
             >
               <ListView

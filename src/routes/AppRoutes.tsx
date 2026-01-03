@@ -14,15 +14,24 @@ function App() {
         <Route path="/" element={<HomePage />} />
         {/* Admin routes */}
         <Route path="/admin/dashboard" element={<DashboardPage />} />
-        <Route path="/admin/addNotification" element={<AddNotificationPage />} />
+        <Route
+          path="/admin/addNotification"
+          element={<AddNotificationPage />}
+        />
         <Route path="/admin/edit/:id" element={<EditNotificationPage />} />
         <Route path="/admin/review/:id" element={<ReviewNotificationPage />} />
 
         {/* Infinite scroll per category */}
-        <Route path="/notification/category/:category" element={<CategoryView />} />
+        <Route
+          path="/notification/category/:category"
+          element={<CategoryView />}
+        />
 
-         {/* User-facing detail page */}
-        <Route path="/notification/:id" element={<UserNotificationDetailPage />} />
+        {/* User-facing detail page */}
+        <Route
+          path="/notification/:id"
+          element={<UserNotificationDetailPage />}
+        />
       </Routes>
     </Router>
   );

@@ -1,4 +1,6 @@
 export const WEBSITE_NAME = "Apply India";
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
 
 export const NOTIFICATION_CATEGORIES = [
@@ -31,7 +33,7 @@ export const NOTIFICATION_CATEGORIES = [
 // /documents/caste-certificate
 
 export const NOTIFICATION_COLUMNS = {
-  ID: "id", // not required in ui
+  SK: "sk", // not required in ui
   TITLE: "title",
   CATEGORY: "category",
   DEPARTMENT: "department",
@@ -77,11 +79,49 @@ export const NOTIFICATION_COLUMNS = {
   RESULT_URL: "result_url",
   OTHER_LINKS: "other_links",
 
-  SLUG: "slug", // not required for ui
-
   APPROVED_BY: "approved_by",
   APPROVED_AT: "approved_at",
   IS_ARCHIVED: "is_archived",
   CREATED_AT: "created_at",
   UPDATED_AT: "updated_at",
 } as const;
+
+
+// constants/socialLinks.ts
+export const APPLYINDIA_SOCIAL_LINKS = [
+  {
+    name: "Facebook",
+    icon: "https://img.icons8.com/color/28/000000/facebook-new.png",
+    url: "https://www.facebook.com/profile.php?id=61585944620623",
+  },
+  {
+    name: "Telegram",
+    icon: "https://img.icons8.com/color/28/000000/telegram-app.png",
+    url: "https://web.telegram.org/k/#@applyindia_online",
+  },
+  {
+    name: "WhatsApp",
+    icon: "https://img.icons8.com/color/28/000000/whatsapp.png",
+    url: "https://whatsapp.com/channel/0029Vb7u8oNCXC3M57Orxa3I",
+  },
+  {
+    name: "YouTube",
+    icon: "https://img.icons8.com/color/28/000000/youtube-play.png",
+    url: "https://youtube.com/@applyindia",
+  },
+  {
+    name: "Instagram",
+    icon: "https://img.icons8.com/color/28/000000/instagram-new.png",
+    url: "https://www.instagram.com/applyindia.online/",
+  },
+  {
+    name: "X",
+    icon: "https://img.icons8.com/ios-filled/28/000000/twitterx--v2.png",
+    url: "https://x.com/ApplyIndia_",
+  },
+  {
+    name: "LinkedIn",
+    icon: "https://img.icons8.com/color/28/000000/linkedin.png",
+    url: "https://www.linkedin.com/company/110909325/admin/dashboard/",
+  },
+];

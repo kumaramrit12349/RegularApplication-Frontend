@@ -2,7 +2,7 @@ import type { NOTIFICATION_CATEGORIES } from "../constant/SharedConstant";
 
 export interface HomePageNotification {
   title: string;
-  slug: string;
+  sk: string;
 }
 
 // types/notification.ts
@@ -64,50 +64,5 @@ export type NotificationFormValues = Omit<
   keyof BaseInterface
 >;
 
-export type NotificationCategory = typeof NOTIFICATION_CATEGORIES[number]["value"];
-
-export const emptyNotificationForm: NotificationFormValues = {
-  title: "",
-  category: "",
-  department: "",
-  total_vacancies: 0,
-
-  short_description: "",
-  long_description: "",
-
-  has_admit_card: false,
-  has_result: false,
-  has_answer_key: false,
-
-  start_date: "",
-  last_date_to_apply: "",
-  exam_date: "",
-  admit_card_available_date: "",
-  result_date: "",
-  important_date_details: "",
-
-  general_fee: 0,
-  obc_fee: 0,
-  sc_fee: 0,
-  st_fee: 0,
-  ph_fee: 0,
-  other_fee_details: "",
-
-  min_age: 0,
-  max_age: 0,
-  age_relaxation_details: "",
-
-  qualification: "",
-  specialization: "",
-  min_percentage: 0,
-  additional_details: "",
-
-  youtube_link: "",
-  apply_online_url: "",
-  notification_pdf_url: "",
-  official_website_url: "",
-  admit_card_url: "",
-  answer_key_url: "",
-  result_url: "",
-  other_links: "",
-};
+export type NotificationCategory =
+  (typeof NOTIFICATION_CATEGORIES)[number]["value"];

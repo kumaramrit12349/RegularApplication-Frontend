@@ -8,6 +8,7 @@ import {
 import { Link } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import Toast from "../../components/Toast/Toast";
+import { getId } from "../../services/utils";
 
 const DashboardPage: React.FC = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -68,7 +69,7 @@ const DashboardPage: React.FC = () => {
   };
 
   // Updated handlers
-  const handleApprove = (id: number) => {
+  const handleApprove = (id: string) => {
     setModal({
       show: true,
       title: "Approve Notification",
@@ -78,7 +79,7 @@ const DashboardPage: React.FC = () => {
       onConfirm: async () => {
         setModal({ ...modal, show: false });
         try {
-          await approveNotification(id.toString());
+          await approveNotification(id);
           showToast("Notification approved successfully!", "success");
           loadNotifications();
         } catch (err: any) {
@@ -88,7 +89,7 @@ const DashboardPage: React.FC = () => {
     });
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     setModal({
       show: true,
       title: "Archive Notification",
@@ -98,7 +99,7 @@ const DashboardPage: React.FC = () => {
       onConfirm: async () => {
         setModal({ ...modal, show: false });
         try {
-          await deleteNotification(id.toString());
+          await deleteNotification(id);
           showToast("Notification archived successfully!", "success");
           loadNotifications();
         } catch (err: any) {
@@ -108,7 +109,7 @@ const DashboardPage: React.FC = () => {
     });
   };
 
-  const handleUnarchive = (id: number) => {
+  const handleUnarchive = (id: string) => {
     setModal({
       show: true,
       title: "Restore Notification",
@@ -118,7 +119,7 @@ const DashboardPage: React.FC = () => {
       onConfirm: async () => {
         setModal({ ...modal, show: false });
         try {
-          await unarchiveNotification(id.toString());
+          await unarchiveNotification(id);
           showToast("Notification restored successfully!", "success");
           loadNotifications();
         } catch (err: any) {
@@ -195,8 +196,8 @@ const DashboardPage: React.FC = () => {
                 </tr>
               ) : (
                 displayList.map((n) => (
-                  <tr key={n.id}>
-                    <td>{n.id}</td>
+                  <tr key={n.sk}>
+                    <td>{n.sk}</td>
                     <td>{n.title}</td>
                     <td>
                       <span className="badge bg-info">{n.category}</span>
@@ -212,7 +213,7 @@ const DashboardPage: React.FC = () => {
                     <td>
                       {/* View button - always visible */}
                       <Link
-                        to={`/admin/review/${n.id}`}
+                        to={`/admin/review/${getId(n.sk)}`}
                         className="btn btn-sm btn-info me-2"
                       >
                         View
@@ -220,7 +221,7 @@ const DashboardPage: React.FC = () => {
                       {/* Edit button - hidden for archived */}
                       {!n.is_archived && (
                         <Link
-                          to={`/admin/edit/${n.id}`}
+                          to={`/admin/edit/${getId(n.sk)}`}
                           className="btn btn-sm btn-secondary me-2"
                         >
                           Edit
@@ -230,7 +231,7 @@ const DashboardPage: React.FC = () => {
                       {!n.approved_at && !n.is_archived && (
                         <button
                           className="btn btn-sm btn-success me-2"
-                          onClick={() => handleApprove(n.id)}
+                          onClick={() => handleApprove(getId(n.sk))}
                         >
                           Approve
                         </button>
@@ -240,14 +241,14 @@ const DashboardPage: React.FC = () => {
                       {!n.is_archived ? (
                         <button
                           className="btn btn-sm btn-danger"
-                          onClick={() => handleDelete(n.id)}
+                          onClick={() => handleDelete(getId(n.sk))}
                         >
                           Archive
                         </button>
                       ) : (
                         <button
                           className="btn btn-sm btn-warning"
-                          onClick={() => handleUnarchive(n.id)}
+                          onClick={() => handleUnarchive(getId(n.sk))}
                         >
                           Restore
                         </button>
