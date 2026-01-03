@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { submitFeedback } from "../../services/feedbackApi";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const FeedbackPage: React.FC = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -9,21 +12,22 @@ const FeedbackPage: React.FC = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     const res = await submitFeedback(form);
 
     if (res.success) {
-      setSuccess(true);
-      setForm({ name: "", email: "", message: "" });
+      toast.success("Thank you! Your feedback has been sent.");
+
+      // ⏳ small delay so user sees toast
+      setTimeout(() => {
+        navigate("/");
+      }, 1800);
     } else {
-      setError(res.message || "Failed to send feedback");
+      toast.error(res.message || "Failed to submit feedback");
     }
 
     setLoading(false);
@@ -40,17 +44,6 @@ const FeedbackPage: React.FC = () => {
                 We value your feedback. Share your thoughts or suggestions with
                 us.
               </p>
-
-              {success && (
-                <div className="alert alert-success text-center">
-                  Thank you! Your feedback has been sent.
-                </div>
-              )}
-
-              {error && (
-                <div className="alert alert-danger text-center">{error}</div>
-              )}
-
               <form onSubmit={handleSubmit} noValidate>
                 {/* Name */}
                 <div className="mb-3">

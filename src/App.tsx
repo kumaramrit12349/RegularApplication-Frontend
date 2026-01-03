@@ -30,6 +30,7 @@ import TermsAndConditions from "./pages/legal/TermsAndConditions";
 import Disclaimer from "./pages/legal/Disclaimer";
 import AboutUs from "./pages/legal/AboutUs";
 import FeedbackPage from "./pages/feedback/FeedbackPage";
+import { ToastContainer } from "react-toastify";
 
 const POPUP_INTERVAL = 90 * 1000;
 
@@ -224,6 +225,14 @@ const AppLayout: React.FC = () => {
         </Routes>
       </main>
 
+      <ToastContainer
+        position="top-center"
+        autoClose={2500}
+        hideProgressBar
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+      />
       <Footer />
 
       <SignUpPopup
